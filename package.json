@@ -1,0 +1,14 @@
+{
+    "name": "Compteur",
+    "dependencies": {
+        "electron": "^1.6.5"
+    },
+    "scripts": {
+        "start": "electron ."
+    },
+    "main": "main.js",
+    "version": "0.0.0",
+    "license": "MIT",
+    "description": "Compteur de points ",
+    "author": "Mathias (Tazaf) Oberson <obersonmathias@gmail.com>"
+}
