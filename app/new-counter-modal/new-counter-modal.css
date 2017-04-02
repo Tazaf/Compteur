@@ -1,0 +1,76 @@
+body {
+  cursor: default;
+  user-select: none;
+}
+
+#nb-player-choice {
+  color: #ede7f6;
+}
+
+#choice-list {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+#choice-list > li {
+  cursor: pointer;
+  margin-top: auto;
+}
+
+#choice-list > li:hover, #choice-list > li.active {
+  font-size: 3em;
+}
+
+#choice-list > li.active {
+ color: #b388ff;
+ font-weight: bold;
+}
+
+
+.input-field {
+  color: #ede7f6;
+}
+
+/* label color */
+.input-field label {
+  color: #ede7f6;
+}
+
+.input-field input[type=number] {
+  border-color: #b388ff;
+  font-size: 4rem;
+}
+
+/* label focus color */
+.input-field input[type=number]:focus + label {
+  color: #b388ff;
+}
+/* label underline focus color */
+.input-field input[type=number]:focus {
+  border-bottom: 1px solid #b388ff;
+  box-shadow: 0 1px 0 0 #b388ff;
+}
+/* valid color */
+.input-field input[type=number].valid {
+  border-bottom: 1px solid #b388ff;
+  box-shadow: 0 1px 0 0 #b388ff;
+}
+/* invalid color */
+.input-field input[type=number].invalid {
+  border-bottom: 1px solid #b388ff;
+  box-shadow: 0 1px 0 0 #b388ff;
+}
+/* icon prefix focus color */
+.input-field .prefix.active {
+  color: #b388ff;
+}
+
+.row .col.s12#cancel:active {
+  color: white;
+}
+
+main {
+  padding: 15px;
+}

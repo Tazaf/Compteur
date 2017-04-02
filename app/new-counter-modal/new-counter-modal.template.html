@@ -4,18 +4,32 @@
     <meta charset="UTF-8">
     <title>Nouveau Compteur</title>
     <link rel="stylesheet" href="../materialize/css/materialize.min.css">
+    <link rel="stylesheet" href="./new-counter-modal.css">
   </head>
-  <body>
-    <div class="container">
-      <h5>Nombre de joueurs</h5>
-      <form action="#">
-        <p class="range-field">
-          <input type="range" id="nbPlayer" min="1" max="10" />
-        </p>
-      </form>
-      <button id="ok" class="btn waves-effect waves-green white green-text text-darken-4">Valider</button>
-      <button id="cancel" class="waves-effect waves-red btn-flat white-text">Annuler</button>
-    </div>
+  <body class="blue-grey darken-4">
+    <main>
+      <p class="deep-purple-text text-lighten-2">Nombre de joueurs</p>
+      <div id="nb-player-choice">
+        <ul id="choice-list">
+          <li>1</li>
+          <li>2</li>
+          <li>3</li>
+          <li>4</li>
+          <li>5</li>
+          <li>6</li>
+          <li>7</li>
+          <li>8</li>
+          <li>9</li>
+          <li>10</li>
+        </ul>
+      </div>
+      <div class="row">
+        <button id="ok" class="col s12 btn waves-effect deep-purple white-text disabled">Commencer</button>
+      </div>
+      <div class="row">
+        <button id="cancel" class="col s12 waves-effect waves-red btn-flat deep-purple-text text-lighten-5">Annuler</button>
+      </div>
+    </main>
       
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <!-- normal script imports etc  -->

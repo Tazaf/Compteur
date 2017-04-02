@@ -77,10 +77,10 @@ function newCounter() {
 function AppMenu() {
   const menuTemplate = [
     {
-      label: 'Compteur',
+      label: 'Partie',
       submenu: [
         {
-          label: 'Nouveau',
+          label: 'Nouvelle',
           accelerator: 'CmdOrCtrl+N',
           click: newCounter
         }

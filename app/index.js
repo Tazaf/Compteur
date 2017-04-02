@@ -19,11 +19,11 @@ function showNbPlayerModal() {
   const main = BrowserWindow.getFocusedWindow()
   let modal = new BrowserWindow({
     parent: main,
-    modal: true,
-    movable: false,
+    // modal: true,
+    // movable: false,
     show: false,
-    frame: false,
-    width: 400,
+    // frame: false,
+    width: 150,
     height: 300,
     title: "Nouveau compteur"
   })
