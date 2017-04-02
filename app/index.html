@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Compteur</title>
+    <link rel="stylesheet" href="./materialize/css/materialize.min.css">
+  </head>
+  <body>
+    <!-- script inclusions -->
+    <!-- Insert this line above script imports  -->
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+    <!-- normal script imports etc  -->
+    <script src="jquery/jquery.min.js"></script>    
+    <script src="materialize/js/materialize.min.js"></script>    
+
+    <!-- Insert this line after script imports -->
+    <script>if (window.module) module = window.module;</script>
+    <script>require('./index.js')</script>  
+    <script src="http://localhost:35729/livereload.js"></script>
+  </body>
+</html>
