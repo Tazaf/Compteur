@@ -1,0 +1,17 @@
+body {
+  user-select: none;
+  cursor: default;
+}
+body a {
+  cursor: pointer;
+}
+
+#nothing {
+  height: 100vh;
+  text-align: center;
+  color: #b0bec5;
+}
+
+#nothing > .valign {
+  width: 100%;
+}

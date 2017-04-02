@@ -39,8 +39,8 @@ function createWindow () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function() {
-  globalShortcut.register('CmdOrCtrl+N', newCounter)
-  Menu.setApplicationMenu(AppMenu())
+  //Menu.setApplicationMenu(AppMenu())
+  registerShortcuts()
   createWindow()
 })
 
@@ -64,8 +64,14 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
+function registerShortcuts() {
+  globalShortcut.register('CmdOrCtrl+N', newCounter)
+}
+
 function newCounter() {
-  win.webContents.send('new-counter')
+  // TODO : Show a window for the user to tell how many player there will be
+  // TODO : Send the number of players through the event
+  win.webContents.send('new-counter', 12)
 }
 
 function AppMenu() {

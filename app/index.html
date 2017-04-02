@@ -4,9 +4,21 @@
     <meta charset="UTF-8">
     <title>Compteur</title>
     <link rel="stylesheet" href="./materialize/css/materialize.min.css">
+    <link rel="stylesheet" href="./index.css">
   </head>
-  <body>
-    
+  <body class="blue-grey darken-4">
+    <main class="container">
+      <div id="nothing" class="valign-wrapper">
+        <div class="valign">
+          <h5>Aucun compteur en cours</h5>
+          <p>Pour démarrer un nouveau compteur :</p>
+          <ul>
+            <li>Cliquez sur <a id="new-counter">Compteur > Nouveau</a> ou</li>
+            <li>Utilisez le raccourci <kbd>Ctrl + N</kbd></li>
+          </ul>
+        </div>
+      </div>
+    </main>
     <!-- script inclusions -->
     <!-- Insert this line above script imports  -->
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
