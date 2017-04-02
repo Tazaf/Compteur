@@ -5,12 +5,17 @@ const path = require('path')
 
 ipc.on('new-counter', (event, arg) => {
   console.log(event, arg)
-  makeNewCounter()
+  showNbPlayerModal()
 })
 
-function makeNewCounter() {
+ipc.on('nb-player', (event, arg) => {
+  $('#nothing').addClass('hide')
+})
+
+$("a#new-counter").click(showNbPlayerModal)
+
+function showNbPlayerModal() {
   const modalPath = path.join('file://', __dirname, 'new-counter-modal/', 'new-counter-modal.template.html')
-  console.log(modalPath)
   const main = BrowserWindow.getFocusedWindow()
   let modal = new BrowserWindow({
     parent: main,
@@ -18,14 +23,14 @@ function makeNewCounter() {
     movable: false,
     show: false,
     frame: false,
-    width: 150,
-    height: 150
+    width: 400,
+    height: 300,
+    title: "Nouveau compteur"
   })
   modal.on('close', () => modal = null)
   modal.loadURL(modalPath)
   modal.show()
-  $('#nothing').addClass('hide')
-  console.log('Nouveau compteur')
 }
 
-$("a#new-counter").click(makeNewCounter)
+// To move to the JS of the modal
+
