@@ -16,7 +16,7 @@ let wins = {}
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
-  // Menu.setApplicationMenu(AppMenu())
+  Menu.setApplicationMenu(AppMenu())
   registerShortcuts()
   createMainWindow()
 })
@@ -61,7 +61,7 @@ function createMainWindow() {
   }))
 
   // Open the DevTools.
-  wins.main.webContents.openDevTools()
+  // wins.main.webContents.openDevTools()
 
   // Emitted when the window is closed.
   wins.main.on('closed', () => {
@@ -70,32 +70,67 @@ function createMainWindow() {
     // when you should delete the corresponding element.
     wins.main = null
   })
+
+  // Create the view for the spectators. This view is hidden by default.
+  // All events in the Main Window will be mirrored by the spectator view
+  createSpectatorView()
 }
 
+/**
+ * Register the shortcutes for this app
+ */
 function registerShortcuts() {
   globalShortcut.register('CmdOrCtrl+N', showNbPlayersModal)
+  globalShortcut.register('CmdOrCtrl+J', addNewPlayer)
+  globalShortcut.register('Alt+S', toggleSpectatorView)
 }
 
+/**
+ * Defines the menu for the application
+ */
 function AppMenu() {
   const menuTemplate = [
     {
       label: 'Partie',
       submenu: [
         {
-          label: 'Nouvelle',
+          label: 'Nouvelle partie',
           accelerator: 'CmdOrCtrl+N',
           click: showNbPlayersModal
+        }, { type: 'separator' }, {
+          label: 'Ajouter un joueur',
+          accelerator: 'CmdOrCtrl+J',
+          click: addNewPlayer
+        }
+      ]
+    }, {
+      label: "Vue",
+      submenu: [
+        {
+          label: 'Vue spectateur',
+          type: 'checkbox',
+          accelerator: 'Alt+S',
+          click: toggleSpectatorView
         }
       ]
     }, {
       role: 'quit',
       label: 'Fermer'
+    }, {
+      label: 'Debug',
+      submenu: [
+        {role: 'toggledevtools'},
+        {role: 'forcereload'}
+      ]
     }
   ]
   const AppMenu = Menu.buildFromTemplate(menuTemplate)
   return AppMenu
 }
 
+/**
+ * Show the modal that asks the user to input the number of player he/she wants for the new game
+ */
 function showNbPlayersModal() {
   wins.nbPlayer = new BrowserWindow({
     parent: wins.main,
@@ -115,7 +150,39 @@ function showNbPlayersModal() {
   }))
   wins.nbPlayer.once('ready-to-show', () => {
     wins.nbPlayer.show()
-    wins.nbPlayer.webContents.openDevTools()
-
   })
+}
+
+/**
+ * Sends an event to the Main Windows, for it to add a new Player Card to the Players List
+ */
+function addNewPlayer() {
+  wins.main.webContents.send('add-new-player')
+}
+
+/**
+ * Either show or hide
+ */
+function toggleSpectatorView() {
+  wins.spectator.isVisible() ? wins.spectator.hide() : wins.spectator.show()
+}
+
+function createSpectatorView() {
+  wins.spectator = new BrowserWindow({
+    parent: wins.main,
+    show: false,
+    width: 500,
+    height: 260,
+    title: "Vue spectateur"
+  })
+  wins.spectator.loadURL(url.format({
+    pathname: path.join(__dirname, 'app', 'spectator-view', 'spectator-view.template.html'),
+    protocol: 'file:',
+    slashes: true
+  }))
+}
+
+function removeSpectatorView() {
+  wins.spectator.close()
+  delete wins.spectator
 }

@@ -1,33 +1,58 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Compteur</title>
-    <link rel="stylesheet" href="./materialize/css/materialize.min.css">
-    <link rel="stylesheet" href="./index.css">
-  </head>
-  <body class="blue-grey lighten-4">
-    <main class="container">
-      <div id="no-game" class="valign-wrapper blue-grey-text">
-        <div class="valign">
-          <h5>Aucune partie en cours...</h5>
-          <p>Pour démarrer une nouvelle partie :</p>
-          <ul>
-            <li>Cliquez sur <a id="new-counter" class="deep-purple-text text-accent-2">Partie > Nouvelle</a> ou</li>
-            <li>Utilisez le raccourci <kbd>Ctrl + N</kbd></li>
-          </ul>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Compteur</title>
+  <link rel="stylesheet" href="./materialize/css/materialize.min.css">
+  <link rel="stylesheet" href="./index.css">
+</head>
+
+<body class="blue-grey lighten-4">
+  <main>
+    <div id="no-game" class="valign-wrapper blue-grey-text hide">
+      <div class="valign">
+        <h5>Aucune partie en cours...</h5>
+        <p>Pour démarrer une nouvelle partie :</p>
+        <ul>
+          <li>Cliquez sur <a id="new-counter" class="deep-purple-text text-accent-2">Partie > Nouvelle</a> ou</li>
+          <li>Utilisez le raccourci <kbd>Ctrl + N</kbd></li>
+        </ul>
+      </div>
+    </div>
+    <div id="game row">
+      <div class="col m12 l6 xl4 player-card">
+        <div class="card-panel blue-grey-text text-darken-3 row">
+          <div class="input-field col s6">
+            <input id="last_name" type="text" class="validate" placeholder="Nom du joueur">
+          </div>
+          <div class="col s2 score">
+            0
+          </div>
+          <div class="col s4">
+            <button class="btn plus-one">+1</button>
+            <button class="btn minus-one">-1</button>
+          </div>
         </div>
       </div>
-    </main>
-    <!-- script inclusions -->
-    <!-- Insert this line above script imports  -->
-    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-    <!-- normal script imports etc  -->
-    <script src="jquery/jquery.min.js"></script>    
-    <script src="materialize/js/materialize.min.js"></script>    
-    <!-- Insert this line after script imports -->
-    <script>if (window.module) module = window.module;</script>
-    <script>require('./index.js')</script>  
-    <script src="http://localhost:35729/livereload.js"></script>
-  </body>
+    </div>
+  </main>
+  <!-- script inclusions -->
+  <!-- Insert this line above script imports  -->
+  <script>
+    if (typeof module === 'object') { window.module = module; module = undefined; }
+  </script>
+  <!-- normal script imports etc  -->
+  <script src="jquery/jquery.min.js"></script>
+  <script src="materialize/js/materialize.min.js"></script>
+  <!-- Insert this line after script imports -->
+  <script>
+    if (window.module) module = window.module;
+  </script>
+  <script>
+    require('./index.js')
+  </script>
+  <script src="http://localhost:35729/livereload.js"></script>
+</body>
+
 </html>
