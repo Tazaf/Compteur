@@ -3,6 +3,35 @@ body {
   user-select: none;
 }
 
+main {
+  padding: 15px;
+}
+
+footer, header {
+  padding: 15px;
+  display: flex;
+}
+
+footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-bottom: 0;
+  justify-content: flex-end;
+}
+
+header > h5 {
+  margin: 0;
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+#cancel {
+  margin-left: 15px;
+}
+
 #nb-player-choice {
   color: #ede7f6;
 }
@@ -10,67 +39,34 @@ body {
 #choice-list {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-end;
+  height: 70px;
+}
+
+#cancel:active {
+  color: white !important;
 }
 
 #choice-list > li {
+  height: 70px;
   cursor: pointer;
-  margin-top: auto;
+  flex: 1;
+  -webkit-transition-duration: 0.1s;
+  transition-duration: 0.1s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #choice-list > li:hover, #choice-list > li.active {
-  font-size: 3em;
+  font-size: 42px;
+  border-bottom: solid 1px;
 }
 
 #choice-list > li.active {
  color: #b388ff;
- font-weight: bold;
+ border-width: 2px;
 }
 
-
-.input-field {
-  color: #ede7f6;
-}
-
-/* label color */
-.input-field label {
-  color: #ede7f6;
-}
-
-.input-field input[type=number] {
-  border-color: #b388ff;
-  font-size: 4rem;
-}
-
-/* label focus color */
-.input-field input[type=number]:focus + label {
-  color: #b388ff;
-}
-/* label underline focus color */
-.input-field input[type=number]:focus {
-  border-bottom: 1px solid #b388ff;
-  box-shadow: 0 1px 0 0 #b388ff;
-}
-/* valid color */
-.input-field input[type=number].valid {
-  border-bottom: 1px solid #b388ff;
-  box-shadow: 0 1px 0 0 #b388ff;
-}
-/* invalid color */
-.input-field input[type=number].invalid {
-  border-bottom: 1px solid #b388ff;
-  box-shadow: 0 1px 0 0 #b388ff;
-}
-/* icon prefix focus color */
-.input-field .prefix.active {
-  color: #b388ff;
-}
-
-.row .col.s12#cancel:active {
-  color: white;
-}
-
-main {
-  padding: 15px;
+#choice-list > .surrounder {
+  font-size: 28px;
 }

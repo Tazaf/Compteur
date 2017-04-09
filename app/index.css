@@ -6,11 +6,11 @@ body a {
   cursor: pointer;
 }
 
-#nothing {
+#no-game {
   height: 100vh;
   text-align: center;
 }
 
-#nothing > .valign {
+#no-game > .valign {
   width: 100%;
 }
