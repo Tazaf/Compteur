@@ -7,7 +7,7 @@ const dialog = electron.dialog
 const ipc = electron.ipcMain
 const path = require('path')
 const url = require('url')
-const events = require(path.join(__dirname, 'app', 'lib', 'event-service.js'))
+const events = require(path.join(__dirname, 'lib', 'event-service.js'))
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -56,7 +56,7 @@ function createMainWindow() {
 
   // and load the index.html of the app.
   wins.main.loadURL(url.format({
-    pathname: path.join(__dirname, 'app', 'index.html'),
+    pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -145,7 +145,7 @@ function showNbPlayersModal() {
   })
   wins.nbPlayer.on('close', () => wins.nbPlayer = null)
   wins.nbPlayer.loadURL(url.format({
-    pathname: path.join(__dirname, 'app', 'new-counter-modal', 'new-counter-modal.template.html'),
+    pathname: path.join(__dirname, 'new-counter-modal', 'new-counter-modal.template.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -184,13 +184,8 @@ function createSpectatorView() {
     e.preventDefault()
   })
   wins.spectator.loadURL(url.format({
-    pathname: path.join(__dirname, 'app', 'spectator-view', 'spectator-view.template.html'),
+    pathname: path.join(__dirname, 'spectator-view', 'spectator-view.template.html'),
     protocol: 'file:',
     slashes: true
   }))
-}
-
-function removeSpectatorView() {
-  wins.spectator.close()
-  delete wins.spectator
 }

@@ -7,10 +7,10 @@
     "start": "electron .",
     "reload": "live-reload . --port 35729"
   },
-  "main": "main.js",
+  "main": "app/main.js",
   "version": "0.0.0",
   "license": "MIT",
-  "description": "Compteur de points ",
+  "description": "Compteur de points",
   "author": "Mathias (Tazaf) Oberson <obersonmathias@gmail.com>",
   "devDependencies": {
     "live-reload": "^1.1.0"
