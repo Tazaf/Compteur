@@ -14,6 +14,7 @@ const autoIncrementDelay = 100
 const $gameZone = $("#game")
 let holdPending
 let holdActive
+let activePlayers = []
 
 $("a#new-counter").click(() => ipc.send(events.nbPlayerModal))
 
@@ -59,12 +60,15 @@ function createNewGame(event, nbPlayer) {
     .then(template => {
       for (let i = 1; i <= nbPlayer; i++) {
         let $player = $(template)
-        $("input", $player).attr({id: `player${i}`, tabindex: i})
+        // $("input", $player).attr({id: `player${i}`, tabindex: i})
+        $("input", $player).attr('id', `player${i}`)
         $("label", $player).attr('for', `player${i}`).text(`Joueur ${i}`)
+        activePlayers.push($player)
         $gameZone.append($player)
       }
       $('#no-game').addClass('hide')
       $gameZone.removeClass('hide')
+      $("input", activePlayers[0]).focus()
     })
 }
 
