@@ -1,7 +1,8 @@
 {
   "name": "Compteur",
   "dependencies": {
-    "electron": "^1.6.5"
+    "electron": "^1.6.5",
+    "lodash": "^4.17.4"
   },
   "scripts": {
     "start": "electron .",

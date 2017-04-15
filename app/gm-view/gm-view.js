@@ -1,30 +1,53 @@
 const fs = require('fs')
 const path = require('path')
 const url = require('url')
+const _ = require('lodash')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
 const BrowserWindow = electron.BrowserWindow
-
+const Menu = electron.remote.Menu
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
-const playerCard = require(path.join(__dirname, '..', 'player-card', 'player-card.js'))
+const playerCard = require(path.join(__dirname, '..', 'player-card', 'player-card.module.js'))
+const getMenuItem = require(path.join(__dirname, '..', 'lib', 'get-menu-item.js'))
 
 const holdDelay = 500
 const autoIncrementDelay = 100
-
 const $gameZone = $("#game")
 let holdPending
 let holdActive
 let activePlayers = []
 
-$("a#new-counter").click(() => ipc.send(events.nbPlayerModal))
+console.log(Menu.getApplicationMenu())
 
-$gameZone.on('mousedown', 'button', initiateAutoIncrement)
-
-$gameZone.on('mouseup', 'button', resolveModifier)
+/* ----- INTERNAL EVENTS ----- */
 
 ipc.on(events.nbPlayerSelected, createNewGame)
 
-ipc.on(events.addNewPlayer, addNewPlayer)
+ipc.on(events.addNewPlayer, createNewPlayer)
+
+/* ----- TEMPLATE EVENTS ----- */
+
+$("a#new-counter").click(() => ipc.send(events.nbPlayerModal))
+
+$gameZone.on({
+  'mousedown': initiateAutoIncrement,
+  'mouseup': resolveModifier
+}, 'button')
+
+$gameZone.on('keydown', 'input', _.debounce(toggleModifierButtons, 250))
+
+/* ----- FUNCTION DECLARATIONS ----- */
+
+/**
+ * Hide or show the modifier buttons depending on the value of their related input.
+ * If the player name's input has a value, then the buttons are enabled.
+ * If it has no value, the buttons are disabled.
+ */
+function toggleModifierButtons() {
+  const value = $(this).val()
+  const $buttons = $("button", $(this).closest('div.player-card'))
+  value !== "" ? $buttons.removeClass('disabled') : $buttons.addClass('disabled')
+}
 
 /**
  * Resolves the correct action when the mouseup event is fired on a modifier button.
@@ -35,7 +58,7 @@ ipc.on(events.addNewPlayer, addNewPlayer)
 function resolveModifier() {
   if (holdPending) {
     clearTimeout(holdPending)
-    let modifier = getModifierFromButton($(this))
+    const modifier = getModifierFromButton($(this))
     changeScore($(this), modifier)
   }
   !!holdActive && clearInterval(holdActive)
@@ -56,28 +79,38 @@ function initiateAutoIncrement() {
  * @param {*} nbPlayer The number of players to create on this new game.
  */
 function createNewGame(event, nbPlayer) {
+  $gameZone.empty()
   playerCard.getTemplate()
     .then(template => {
       for (let i = 1; i <= nbPlayer; i++) {
-        let $player = $(template)
-        // $("input", $player).attr({id: `player${i}`, tabindex: i})
-        $("input", $player).attr('id', `player${i}`)
-        $("label", $player).attr('for', `player${i}`).text(`Joueur ${i}`)
-        activePlayers.push($player)
-        $gameZone.append($player)
+        addNewPlayerCard(template, i)
       }
       $('#no-game').addClass('hide')
       $gameZone.removeClass('hide')
       $("input", activePlayers[0]).focus()
+      enableNewPlayerMenuItem()
     })
+}
+
+function addNewPlayerCard(template, playerNb) {
+  const $player = $(template)
+  $("input", $player).attr('id', `player${playerNb}`)
+  $("label", $player).attr('for', `player${playerNb}`).text(`Joueur ${playerNb}`)
+  activePlayers.push($player)
+  $gameZone.append($player)
 }
 
 /**
  * Adds a new player in the current game.
  */
-function addNewPlayer() {
-  // TODO : Create a new player template
-  $('#game').append($('<p>').text('Nouveau Joueur'))
+function createNewPlayer() {
+  const newPlayerNb = activePlayers.length + 1
+  if (newPlayerNb === 1 || newPlayerNb === 11) return
+  playerCard.getTemplate()
+    .then((template) => {
+      addNewPlayerCard(template, newPlayerNb)
+      $("input", activePlayers[newPlayerNb]).focus()
+    })
 }
 
 /**
@@ -104,8 +137,8 @@ function getModifierFromButton($ele) {
  * @param {*} modifier The modifier to apply to the new score
  */
 function changeScore($ele, modifier) {
-  let $player = $ele.closest('div.player-card')
-  let $score = $("h1.value", $player)
+  const $player = $ele.closest('div.player-card')
+  const $score = $("h1.value", $player)
   let score = parseInt($score.text())
   score += modifier
   score < 0 && (score = 0)
@@ -121,6 +154,12 @@ function changeScore($ele, modifier) {
  * @param {*} $ele The button from which the autoIncrement will be based on
  */
 function autoIncrement($ele) {
-  let modifier = getModifierFromButton($ele)
+  const modifier = getModifierFromButton($ele)
   holdActive = setInterval(() => changeScore($ele, modifier), autoIncrementDelay)
+}
+
+function enableNewPlayerMenuItem() {
+  const AppMenu = Menu.getApplicationMenu()
+  const newPlayerItem = getMenuItem('add-new-player', AppMenu)
+  newPlayerItem.enabled = true;
 }

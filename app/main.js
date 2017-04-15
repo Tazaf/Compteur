@@ -8,6 +8,7 @@ const ipc = electron.ipcMain
 const path = require('path')
 const url = require('url')
 const events = require(path.join(__dirname, 'lib', 'event-service.js'))
+const getMenuItem = require(path.join(__dirname, 'lib', 'get-menu-item.js'))
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -97,7 +98,9 @@ function AppMenu() {
           click: showNbPlayersModal
         }, { type: 'separator' }, {
           label: 'Ajouter un joueur',
+          id: 'add-new-player',
           accelerator: 'CmdOrCtrl+J',
+          enabled: false,
           click: addNewPlayer
         }
       ]
@@ -106,6 +109,7 @@ function AppMenu() {
       submenu: [
         {
           label: 'Vue spectateur',
+          id: 'spectator-view',
           type: 'checkbox',
           accelerator: 'Alt+S',
           click: toggleSpectatorView
@@ -130,6 +134,7 @@ function AppMenu() {
  * Show the modal that asks the user to input the number of player he/she wants for the new game
  */
 function showNbPlayersModal() {
+  if ('undefined' !== typeof wins.nbPlayer) return
   wins.nbPlayer = new BrowserWindow({
     parent: wins.gmView,
     modal: true,
@@ -140,7 +145,7 @@ function showNbPlayersModal() {
     height: 260,
     title: "Nombre de joueurs"
   })
-  wins.nbPlayer.on('close', () => wins.nbPlayer = null)
+  wins.nbPlayer.on('close', () => delete wins.nbPlayer)
   wins.nbPlayer.loadURL(url.format({
     pathname: path.join(__dirname, 'new-counter-modal', 'new-counter-modal.html'),
     protocol: 'file:',
@@ -175,8 +180,7 @@ function createSpectatorView() {
   })
   wins.spectator.setMenu(null)
   wins.spectator.on('close', e => {
-    let menu = Menu.getApplicationMenu()
-    console.log(menu)
+    uncheckSpectatorViewMenuItem()
     wins.spectator.hide()
     e.preventDefault()
   })
@@ -185,4 +189,16 @@ function createSpectatorView() {
     protocol: 'file:',
     slashes: true
   }))
+}
+
+function checkSpectatorViewMenuItem() {
+  const AppMenu = Menu.getApplicationMenu()
+  const MenuItem = getMenuItem('spectator-view', AppMenu)
+  MenuItem.checked = true;
+}
+
+function uncheckSpectatorViewMenuItem() {
+  const AppMenu = Menu.getApplicationMenu()
+  const MenuItem = getMenuItem('spectator-view2', AppMenu)
+  MenuItem.checked = false;
 }
