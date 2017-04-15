@@ -7,6 +7,7 @@ const dialog = electron.dialog
 const ipc = electron.ipcMain
 const path = require('path')
 const url = require('url')
+const events = require(path.join(__dirname, 'app', 'lib', 'event-service.js'))
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -38,13 +39,13 @@ app.on('activate', () => {
   }
 })
 
-ipc.on('nb-player-modal', showNbPlayersModal)
+ipc.on(events.nbPlayerModal, showNbPlayersModal)
 
-ipc.on('nb-player-modal-close', () => wins.nbPlayer.close())
+ipc.on(events.nbPlayerModalClose, () => wins.nbPlayer.close())
 
-ipc.on('nb-player-selected', (event, args) => {
+ipc.on(events.nbPlayerSelected, (event, args) => {
   wins.nbPlayer.close()
-  wins.main.webContents.send('nb-player-selected', args)
+  wins.main.webContents.send(events.nbPlayerSelected, args)
 })
 
 // In this file you can include the rest of your app's specific main process
@@ -119,8 +120,8 @@ function AppMenu() {
     }, {
       label: 'Debug',
       submenu: [
-        {role: 'toggledevtools'},
-        {role: 'forcereload'}
+        { role: 'toggledevtools' },
+        { role: 'forcereload' }
       ]
     }
   ]
@@ -157,7 +158,7 @@ function showNbPlayersModal() {
  * Sends an event to the Main Windows, for it to add a new Player Card to the Players List
  */
 function addNewPlayer() {
-  wins.main.webContents.send('add-new-player')
+  wins.main.webContents.send(events.addNewPlayer)
 }
 
 /**
@@ -174,6 +175,13 @@ function createSpectatorView() {
     width: 500,
     height: 260,
     title: "Vue spectateur"
+  })
+  wins.spectator.setMenu(null)
+  wins.spectator.on('close', e => {
+    let menu = Menu.getApplicationMenu()
+    console.log(menu)
+    wins.spectator.hide()
+    e.preventDefault()
   })
   wins.spectator.loadURL(url.format({
     pathname: path.join(__dirname, 'app', 'spectator-view', 'spectator-view.template.html'),

@@ -1,6 +1,9 @@
 const electron = require('electron')
+const path = require('path')
 const ipc = electron.ipcRenderer
 const BrowserWindows = electron.remote.BrowserWindow
+const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
+console.log(events)
 
 const selfWin = BrowserWindows.getFocusedWindow()
 const choiceList = $('#choice-list')
@@ -8,9 +11,9 @@ const okBtn = $('#ok')
 
 var nbPlayers;
 
-$('#cancel').click(() => ipc.send('nb-player-modal-close'))
+$('#cancel').click(() => ipc.send(events.nbPlayerModalClose))
 
-$('#ok').click(() => ipc.send('nb-player-selected', nbPlayers))
+$('#ok').click(() => ipc.send(events.nbPlayerSelected, nbPlayers))
 
 $('li', choiceList).click(selectChoice)
 

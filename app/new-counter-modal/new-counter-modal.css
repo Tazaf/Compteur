@@ -33,7 +33,7 @@ header > h5 {
 }
 
 #nb-player-choice {
-  color: #ede7f6;
+  color: white;
 }
 
 #choice-list {
@@ -63,7 +63,7 @@ header > h5 {
 }
 
 #choice-list > li.active {
- color: #b388ff;
+ color: #ff6e40;
  border-width: 2px;
 }
 

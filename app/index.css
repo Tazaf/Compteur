@@ -19,32 +19,61 @@ main {
   width: 100%;
 }
 
+div.player {
+  display: flex;
+  justify-content: flex-end;
+}
+
+h1.value,
+.player-name,
+.player-name input {
+  margin: 0;
+}
+
+.player-name {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+}
+
+.player-name .input-field {
+  width: 100%;
+}
+.player-name input[type=text] {
+  border-bottom: 1px solid #ff3d00;
+}
+
+div.modifiers {
+  display: flex;
+}
+
+div.plus-modifiers, div.minus-modifiers {
+  display: flex;
+  flex-direction: column;
+}
+
+.score {
+  width: 145px;
+  text-align: center;
+  padding: 0 15px;
+}
+
 /** Changing the color of the inputs **/
 
 /* label color */
 .input-field label {
-  color: #000;
+  color: #ff3d00;
 }
 /* label focus color */
 .input-field input[type=text]:focus + label {
-  color: #000;
+  color: #ff3d00;
 }
 /* label underline focus color */
 .input-field input[type=text]:focus {
-  border-bottom: 1px solid #000;
-  box-shadow: 0 1px 0 0 #000;
-}
-/* valid color */
-.input-field input[type=text].valid {
-  border-bottom: 1px solid #000;
-  box-shadow: 0 1px 0 0 #000;
-}
-/* invalid color */
-.input-field input[type=text].invalid {
-  border-bottom: 1px solid #000;
-  box-shadow: 0 1px 0 0 #000;
+  border-bottom: 1px solid #ff3d00;
+  box-shadow: 0 1px 0 0 #ff3d00;
 }
 /* icon prefix focus color */
 .input-field .prefix.active {
-  color: #000;
+  color: #ff3d00;
 }
