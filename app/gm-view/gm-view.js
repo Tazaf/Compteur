@@ -5,8 +5,8 @@ const electron = require('electron')
 const ipc = electron.ipcRenderer
 const BrowserWindow = electron.BrowserWindow
 
-const events = require(path.join(__dirname, 'lib', 'event-service.js'))
-const playerCard = require(path.join(__dirname, 'player-card', 'player-card.js'))
+const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
+const playerCard = require(path.join(__dirname, '..', 'player-card', 'player-card.js'))
 
 const holdDelay = 500
 const autoIncrementDelay = 100

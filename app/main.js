@@ -19,7 +19,7 @@ let wins = {}
 app.on('ready', function () {
   Menu.setApplicationMenu(AppMenu())
   registerShortcuts()
-  createMainWindow()
+  createGameMasterView()
 })
 
 // Quit when all windows are closed.
@@ -34,8 +34,8 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (wins.main === null) {
-    createMainWindow()
+  if (wins.gmView === null) {
+    createGameMasterView()
   }
 })
 
@@ -45,35 +45,32 @@ ipc.on(events.nbPlayerModalClose, () => wins.nbPlayer.close())
 
 ipc.on(events.nbPlayerSelected, (event, args) => {
   wins.nbPlayer.close()
-  wins.main.webContents.send(events.nbPlayerSelected, args)
+  wins.gmView.webContents.send(events.nbPlayerSelected, args)
 })
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-function createMainWindow() {
+function createGameMasterView() {
   // Create the browser window.
-  wins.main = new BrowserWindow({ width: 800, height: 600 })
+  wins.gmView = new BrowserWindow({ width: 800, height: 600 })
 
   // and load the index.html of the app.
-  wins.main.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
+  wins.gmView.loadURL(url.format({
+    pathname: path.join(__dirname, 'gm-view', 'gm-view.html'),
     protocol: 'file:',
     slashes: true
   }))
 
   // Open the DevTools.
-  // wins.main.webContents.openDevTools()
+  wins.gmView.webContents.openDevTools()
 
   // Emitted when the window is closed.
-  wins.main.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    wins.main = null
+  wins.gmView.on('closed', () => {
+    wins.gmView = null
   })
 
   // Create the view for the spectators. This view is hidden by default.
-  // All events in the Main Window will be mirrored by the spectator view
+  // All events in the GameMaster View will be mirrored in the Spectator View
   createSpectatorView()
 }
 
@@ -134,7 +131,7 @@ function AppMenu() {
  */
 function showNbPlayersModal() {
   wins.nbPlayer = new BrowserWindow({
-    parent: wins.main,
+    parent: wins.gmView,
     modal: true,
     movable: false,
     show: false,
@@ -145,7 +142,7 @@ function showNbPlayersModal() {
   })
   wins.nbPlayer.on('close', () => wins.nbPlayer = null)
   wins.nbPlayer.loadURL(url.format({
-    pathname: path.join(__dirname, 'new-counter-modal', 'new-counter-modal.template.html'),
+    pathname: path.join(__dirname, 'new-counter-modal', 'new-counter-modal.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -158,7 +155,7 @@ function showNbPlayersModal() {
  * Sends an event to the Main Windows, for it to add a new Player Card to the Players List
  */
 function addNewPlayer() {
-  wins.main.webContents.send(events.addNewPlayer)
+  wins.gmView.webContents.send(events.addNewPlayer)
 }
 
 /**
@@ -170,7 +167,7 @@ function toggleSpectatorView() {
 
 function createSpectatorView() {
   wins.spectator = new BrowserWindow({
-    parent: wins.main,
+    parent: wins.gmView,
     show: false,
     width: 500,
     height: 260,

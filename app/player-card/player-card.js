@@ -9,7 +9,7 @@ exports.getTemplate = getTemplate
  */
 function getTemplate() {
   return new Promise((resolve, reject) => {
-    const templateUrl = path.join(__dirname, 'player-card.template.html')
+    const templateUrl = path.join(__dirname, 'player-card.html')
     fs.readFile(templateUrl, 'utf8', (err, data) => {
       err ? reject(err) : resolve(data);
     });
