@@ -8,15 +8,19 @@ body a {
 
 main {
   padding: 15px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 #no-game {
-  height: 100vh;
+  height: 100%;
+  display: flex;
   text-align: center;
-}
-
-#no-game > .valign {
-  width: 100%;
+  justify-content: center;
+  align-items: center;
 }
 
 div.player {

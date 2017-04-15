@@ -1,9 +1,12 @@
+const fs = require('fs')
 const path = require('path')
 const url = require('url')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
 const BrowserWindow = electron.BrowserWindow
+
 const events = require(path.join(__dirname, 'lib', 'event-service.js'))
+const playerCard = require(path.join(__dirname, 'player-card', 'player-card.js'))
 
 const holdDelay = 500
 const autoIncrementDelay = 100
@@ -52,8 +55,17 @@ function initiateAutoIncrement() {
  * @param {*} nbPlayer The number of players to create on this new game.
  */
 function createNewGame(event, nbPlayer) {
-  // TODO : Create all player templates
-  $('#no-game').addClass('hide')
+  playerCard.getTemplate()
+    .then(template => {
+      for (let i = 1; i <= nbPlayer; i++) {
+        let $player = $(template)
+        $("input", $player).attr({id: `player${i}`, tabindex: i})
+        $("label", $player).attr('for', `player${i}`).text(`Joueur ${i}`)
+        $gameZone.append($player)
+      }
+      $('#no-game').addClass('hide')
+      $gameZone.removeClass('hide')
+    })
 }
 
 /**
@@ -88,11 +100,9 @@ function getModifierFromButton($ele) {
  * @param {*} modifier The modifier to apply to the new score
  */
 function changeScore($ele, modifier) {
-  console.log(modifier)
   let $player = $ele.closest('div.player-card')
   let $score = $("h1.value", $player)
   let score = parseInt($score.text())
-  console.log(score)
   score += modifier
   score < 0 && (score = 0)
   score > 999 && (score = 999)
