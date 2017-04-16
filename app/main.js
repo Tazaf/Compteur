@@ -21,6 +21,8 @@ let CacheMenuItems = {
   newPlayer: undefined
 }
 
+/* ----- APP EVENTS ----- */
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -49,6 +51,8 @@ app.on('activate', () => {
   }
 })
 
+/* ----- INTERNAL EVENTS ----- */
+
 ipc.on(events.nbPlayerModal, showNbPlayersModal)
 
 ipc.on(events.nbPlayerModalClose, () => wins.nbPlayer.close())
@@ -61,6 +65,8 @@ ipc.on(events.nbPlayerSelected, (event, args) => {
 ipc.on(events.enableNewPlayerMenuItem, () => {
   getNewPlayerMenuItem().enabled = true
 })
+
+/* ----- FUNCTIONS DECLARATIONS ----- */
 
 /**
  * Register the shortcutes for this app

@@ -10,12 +10,19 @@ const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
 const playerCard = require(path.join(__dirname, '..', 'player-card', 'player-card.module.js'))
 const getMenuItem = require(path.join(__dirname, '..', 'lib', 'get-menu-item.js'))
 
+// The number of milliseconds to wait before a click is considered a hold
 const holdDelay = 500
-const autoIncrementDelay = 100
-const maxNbPlayer = 10
-const $gameZone = $("#game")
+// Global variable to store the reference to the setTimeout that will trigger the click-hold event
 let holdPending
+// Global variable to store the reference to the setInterval responsible for the autoincrementation of the score
 let holdActive
+// The interval, in milliseconds, between each score automatic incrementation
+const autoIncrementDelay = 100
+// Maximum number of players in a game
+const maxNbPlayer = 10
+// A jQuery object representing the HTML game zone
+const $gameZone = $("#game")
+// Cache for the jQuery objects representing each Player Cards
 let activePlayers = []
 
 /* ----- INTERNAL EVENTS ----- */

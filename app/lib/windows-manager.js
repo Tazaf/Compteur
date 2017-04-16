@@ -6,6 +6,12 @@ const url = require('url')
 // Global references to the windows created
 const wins = {}
 
+// Exports statement
+exports.repository = wins
+exports.createGameMasterView = createGameMasterView
+exports.createSpectatorView = createSpectatorView
+exports.createNbPlayersModal = createNbPlayersModal
+
 /**
  * Create the Game Master View, which is the main view of the app.
  * Closing this window should result in quitting the app, except on Mac OS.
@@ -72,9 +78,3 @@ function createNbPlayersModal() {
     wins.nbPlayer.show()
   })
 }
-
-// Exports statement
-exports.repository = wins
-exports.createGameMasterView = createGameMasterView
-exports.createSpectatorView = createSpectatorView
-exports.createNbPlayersModal = createNbPlayersModal
