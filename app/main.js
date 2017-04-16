@@ -9,10 +9,17 @@ const path = require('path')
 const url = require('url')
 const events = require(path.join(__dirname, 'lib', 'event-service.js'))
 const getMenuItem = require(path.join(__dirname, 'lib', 'get-menu-item.js'))
+const WindowsManager = require(path.join(__dirname, 'lib', 'windows-manager.js'))
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let wins = {}
+let wins = WindowsManager.repository
+
+// Cache for Menu Item
+let CacheMenuItems = {
+  spectatorView: undefined,
+  newPlayer: undefined
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -20,7 +27,8 @@ let wins = {}
 app.on('ready', function () {
   Menu.setApplicationMenu(AppMenu())
   registerShortcuts()
-  createGameMasterView()
+  WindowsManager.createGameMasterView()
+  WindowsManager.createSpectatorView(closeSpectatorView)
 })
 
 // Quit when all windows are closed.
@@ -36,7 +44,8 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (wins.gmView === null) {
-    createGameMasterView()
+    WindowsManager.createGameMasterView()
+    WindowsManager.createSpectatorView(closeSpectatorView)
   }
 })
 
@@ -49,31 +58,9 @@ ipc.on(events.nbPlayerSelected, (event, args) => {
   wins.gmView.webContents.send(events.nbPlayerSelected, args)
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-function createGameMasterView() {
-  // Create the browser window.
-  wins.gmView = new BrowserWindow({ width: 800, height: 600 })
-
-  // and load the index.html of the app.
-  wins.gmView.loadURL(url.format({
-    pathname: path.join(__dirname, 'gm-view', 'gm-view.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
-  // Open the DevTools.
-  wins.gmView.webContents.openDevTools()
-
-  // Emitted when the window is closed.
-  wins.gmView.on('closed', () => {
-    wins.gmView = null
-  })
-
-  // Create the view for the spectators. This view is hidden by default.
-  // All events in the GameMaster View will be mirrored in the Spectator View
-  createSpectatorView()
-}
+ipc.on(events.enableNewPlayerMenuItem, () => {
+  getNewPlayerMenuItem().enabled = true
+})
 
 /**
  * Register the shortcutes for this app
@@ -135,70 +122,61 @@ function AppMenu() {
  */
 function showNbPlayersModal() {
   if ('undefined' !== typeof wins.nbPlayer) return
-  wins.nbPlayer = new BrowserWindow({
-    parent: wins.gmView,
-    modal: true,
-    movable: false,
-    show: false,
-    frame: false,
-    width: 500,
-    height: 260,
-    title: "Nombre de joueurs"
-  })
-  wins.nbPlayer.on('close', () => delete wins.nbPlayer)
-  wins.nbPlayer.loadURL(url.format({
-    pathname: path.join(__dirname, 'new-counter-modal', 'new-counter-modal.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-  wins.nbPlayer.once('ready-to-show', () => {
-    wins.nbPlayer.show()
-  })
+  WindowsManager.createNbPlayersModal()
 }
 
 /**
- * Sends an event to the Main Windows, for it to add a new Player Card to the Players List
+ * Sends an event to the Game Master Window, for it to add a new Player Card to the Players List
  */
 function addNewPlayer() {
   wins.gmView.webContents.send(events.addNewPlayer)
 }
 
 /**
- * Either show or hide
+ * Either show (if hidden) or hide (if visible) the Spectator View
  */
 function toggleSpectatorView() {
-  wins.spectator.isVisible() ? wins.spectator.hide() : wins.spectator.show()
-}
-
-function createSpectatorView() {
-  wins.spectator = new BrowserWindow({
-    parent: wins.gmView,
-    show: false,
-    width: 500,
-    height: 260,
-    title: "Vue spectateur"
-  })
-  wins.spectator.setMenu(null)
-  wins.spectator.on('close', e => {
-    uncheckSpectatorViewMenuItem()
+  if (wins.spectator.isVisible()) {
     wins.spectator.hide()
-    e.preventDefault()
-  })
-  wins.spectator.loadURL(url.format({
-    pathname: path.join(__dirname, 'spectator-view', 'spectator-view.template.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
+    getSpectatorViewMenuItem().checked = false
+  } else {
+    wins.spectator.show()
+    getSpectatorViewMenuItem().checked = true
+  }
 }
 
-function checkSpectatorViewMenuItem() {
-  const AppMenu = Menu.getApplicationMenu()
-  const MenuItem = getMenuItem('spectator-view', AppMenu)
-  MenuItem.checked = true;
+/**
+ * Returns the menu item related to showing the Spectator View.
+ * The function caches the reference to the Menu Item object, for subsequent calls.
+ */
+function getSpectatorViewMenuItem() {
+  if (!CacheMenuItems.spectatorView) {
+    const AppMenu = Menu.getApplicationMenu()
+    CacheMenuItems.spectatorView = getMenuItem.byId('spectator-view', AppMenu)
+  }
+  return CacheMenuItems.spectatorView
 }
 
-function uncheckSpectatorViewMenuItem() {
-  const AppMenu = Menu.getApplicationMenu()
-  const MenuItem = getMenuItem('spectator-view2', AppMenu)
-  MenuItem.checked = false;
+/**
+ * Returns the menu item related to adding a new player in the current game.
+ * The function caches the reference to the Menu Item object, for subsequent calls.
+ */
+function getNewPlayerMenuItem() {
+  if (!CacheMenuItems.newPlayer) {
+    const AppMenu = Menu.getApplicationMenu()
+    CacheMenuItems.newPlayer = getMenuItem.byId('add-new-player', AppMenu)
+  }
+  return CacheMenuItems.newPlayer
+}
+
+/**
+ * This is the callback that is passed to the Spectator View on creation.
+ * It will be triggered by the 'close' event of the window.
+ * It unchecks the menu item for the spectator view and hide the window.
+ * @param {*} e The closing event
+ */
+function closeSpectatorView(e) {
+  getSpectatorViewMenuItem().checked = false
+  wins.spectator.hide()
+  e.preventDefault()
 }
