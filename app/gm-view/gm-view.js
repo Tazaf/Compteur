@@ -12,12 +12,11 @@ const getMenuItem = require(path.join(__dirname, '..', 'lib', 'get-menu-item.js'
 
 const holdDelay = 500
 const autoIncrementDelay = 100
+const maxNbPlayer = 10
 const $gameZone = $("#game")
 let holdPending
 let holdActive
 let activePlayers = []
-
-console.log(Menu.getApplicationMenu())
 
 /* ----- INTERNAL EVENTS ----- */
 
@@ -88,10 +87,16 @@ function createNewGame(event, nbPlayer) {
       $('#no-game').addClass('hide')
       $gameZone.removeClass('hide')
       $("input", activePlayers[0]).focus()
-      enableNewPlayerMenuItem()
+      ipc.send(events.enableNewPlayerMenuItem)
     })
 }
 
+/**
+ * Adds a new HTML Player Card in the page, and stores a reference to this card in the activePlayers array.
+ * The new Player Card will be compiled with the number of the player.
+ * @param {*} template The template for a Player Card
+ * @param {*} playerNb The number of the Player to add
+ */
 function addNewPlayerCard(template, playerNb) {
   const $player = $(template)
   $("input", $player).attr('id', `player${playerNb}`)
@@ -101,11 +106,13 @@ function addNewPlayerCard(template, playerNb) {
 }
 
 /**
- * Adds a new player in the current game.
+ * If possible, creates a new player in the current game.
+ * This action will do nothing if there is no current game
+ * or that the maximum number of players is reached.
  */
 function createNewPlayer() {
   const newPlayerNb = activePlayers.length + 1
-  if (newPlayerNb === 1 || newPlayerNb === 11) return
+  if (newPlayerNb === 1 || newPlayerNb > maxNbPlayer) return
   playerCard.getTemplate()
     .then((template) => {
       addNewPlayerCard(template, newPlayerNb)
@@ -156,10 +163,4 @@ function changeScore($ele, modifier) {
 function autoIncrement($ele) {
   const modifier = getModifierFromButton($ele)
   holdActive = setInterval(() => changeScore($ele, modifier), autoIncrementDelay)
-}
-
-function enableNewPlayerMenuItem() {
-  const AppMenu = Menu.getApplicationMenu()
-  const newPlayerItem = getMenuItem('add-new-player', AppMenu)
-  newPlayerItem.enabled = true;
 }
