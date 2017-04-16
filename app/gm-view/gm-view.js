@@ -21,7 +21,7 @@ const autoIncrementDelay = 100
 // Maximum number of players in a game
 const maxNbPlayer = 10
 // A jQuery object representing the HTML game zone
-const $gameZone = $("#game")
+const $playersZone = $("#players")
 // Cache for the jQuery objects representing each Player Cards
 let $activePlayers = []
 let playerScores = []
@@ -36,12 +36,16 @@ ipc.on(events.addNewPlayer, createNewPlayer)
 
 $("a#new-counter").click(() => ipc.send(events.nbPlayerModal))
 
-$gameZone.on({
+$("#add-new-player").click(createNewPlayer)
+
+$playersZone.on({
   'mousedown': initiateAutoIncrement,
   'mouseup': resolveModifier
 }, 'button')
 
-$gameZone.on('keydown', 'input', _.debounce(updatePlayerName, 250))
+$playersZone.on('keydown', 'input', _.debounce(updatePlayerName, 250))
+
+createNewGame(null, 5)
 
 /* ----- FUNCTION DECLARATIONS ----- */
 
@@ -96,7 +100,8 @@ function initiateAutoIncrement() {
  * @param {*} nbPlayer The number of players to create on this new game.
  */
 function createNewGame(event, nbPlayer) {
-  $gameZone.empty()
+  $("#add-new-player").removeClass('hide')
+  $playersZone.empty()
   $activePlayers = []
   playerCard.getTemplate()
     .then(template => {
@@ -104,7 +109,7 @@ function createNewGame(event, nbPlayer) {
         addNewPlayerCard(template, i)
       }
       $('#no-game').addClass('hide')
-      $gameZone.removeClass('hide')
+      $("#game").removeClass('hide')
       $("input", $activePlayers[1]).focus()
       ipc.send(events.enableNewPlayerMenuItem)
     })
@@ -121,7 +126,7 @@ function addNewPlayerCard(template, playerNb) {
   $("input", $player).attr('id', playerNb)
   $("label", $player).attr('for', playerNb).text(`Joueur ${playerNb}`)
   $activePlayers[playerNb] = $player
-  $gameZone.append($player)
+  $playersZone.append($player)
 }
 
 /**
@@ -139,6 +144,9 @@ function createNewPlayer() {
       $("input", $activePlayers[newPlayerNb]).focus()
       newPlayerNb === maxNbPlayer && ipc.send(events.disableNewPlayerMenuItem)
     })
+  if (newPlayerNb === maxNbPlayer) {
+    $("#add-new-player").addClass('hide')
+  }
 }
 
 /**s
@@ -195,6 +203,9 @@ function autoIncrement($ele) {
   holdActive = setInterval(() => changeScore($ele, modifier), autoIncrementDelay)
 }
 
+/**
+ * Returns the greater current score among all active players
+ */
 function getMaxScore() {
   return _.max(playerScores)
 }

@@ -23,6 +23,26 @@ main {
   align-items: center;
 }
 
+#new-player-button {
+  height: 120px;
+  margin-top: .5rem;
+  border: 1px dotted #ff9e80;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ff9e80;
+  cursor: pointer;
+}
+#new-player-button i {
+  margin-right: 10px;
+}
+#new-player-button:hover, #new-player-button:active {
+  border-color: #ff3d00;
+  color: #ff3d00;
+  background-color: rgba(255, 255, 255, 0.2)
+}
+
 div.player {
   display: flex;
   justify-content: flex-end;
