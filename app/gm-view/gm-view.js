@@ -24,7 +24,6 @@ const maxNbPlayer = 10
 const $playersZone = $("#players")
 // Cache for the jQuery objects representing each Player Cards
 let $activePlayers = []
-let playerScores = []
 
 /* ----- INTERNAL EVENTS ----- */
 
@@ -43,9 +42,7 @@ $playersZone.on({
   'mouseup': resolveModifier
 }, 'button')
 
-$playersZone.on('keydown', 'input', _.debounce(updatePlayerName, 250))
-
-createNewGame(null, 5)
+$playersZone.on('keydown', 'input', _.debounce(updatePlayerName, 150))
 
 /* ----- FUNCTION DECLARATIONS ----- */
 
@@ -183,11 +180,9 @@ function changeScore($ele, modifier) {
   score > 999 && (score = 999)
 
   $score.text(score)
-  playerScores[playerNb] = score
   ipc.send(events.updatePlayerScore, {
     playerNb,
     score,
-    maxScore: getMaxScore()
   })
 }
 
@@ -201,11 +196,4 @@ function changeScore($ele, modifier) {
 function autoIncrement($ele) {
   const modifier = getModifierFromButton($ele)
   holdActive = setInterval(() => changeScore($ele, modifier), autoIncrementDelay)
-}
-
-/**
- * Returns the greater current score among all active players
- */
-function getMaxScore() {
-  return _.max(playerScores)
 }

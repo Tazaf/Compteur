@@ -41,8 +41,10 @@ function createSpectatorView(closeCallback) {
   wins.spectator = new BrowserWindow({
     parent: wins.gmView,
     show: false,
-    width: 500,
-    height: 260,
+    width: 800,
+    height: 600,
+    skipTaskbar: true,
+    backgroundColor: '#cfd8dc',
     title: "Vue spectateur"
   })
   // wins.spectator.setMenu(null)

@@ -1,5 +1,6 @@
 const path = require('path')
 const electron = require('electron')
+const _ = require('lodash')
 const ipc = electron.ipcRenderer
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
 const playerResult = require(path.join(__dirname, '..', 'player-result', 'player-result.module.js'))
@@ -7,6 +8,7 @@ const playerResult = require(path.join(__dirname, '..', 'player-result', 'player
 const $resultZone = $("#results")
 
 let $activePlayers = []
+let playerScores = []
 
 /* ----- INTERNAL EVENTS ----- */
 
@@ -23,6 +25,7 @@ ipc.on(events.addNewPlayer, () => console.log('new player'))
 function reflectNewGame(event, nbPlayer) {
   $resultZone.empty()
   $activePlayers = []
+  playerScores = []
   playerResult.getTemplate()
     .then(template => {
       for (let i = 1; i <= nbPlayer; i++) {
@@ -47,13 +50,36 @@ function updatePlayerName(event, data) {
   $playerName.text(data.value || `Joueur ${data.playerNb}`)
 }
 
-function updatePlayerScore(event, data) {
-  const $playerResult = $activePlayers[data.playerNb]
-  const $playerScore = $("progress", $playerResult)
-  updateMaxScore(data.maxScore)
-  $playerScore.attr('value', data.score)
+function updateScores() {
+  const max = getMaxScore()
+  $activePlayers.forEach($player => {
+    const playerNb = $player.attr('id')
+    const $bar = $("div.inner-score", $player)
+    const $score = $("span.score-display", $player)
+    $score.text(playerScores[playerNb])
+    const ratio = playerScores[playerNb] * 100 /max
+    console.log(playerNb, $bar, $score, playerScores[playerNb], ratio)
+    if (!isNaN(ratio)) {
+      $bar.animate({width: `${ratio}%`}, 150)
+      $score.animate({'margin-left': `${ratio}%`}, 150)
+    }
+  })
 }
 
-function updateMaxScore(value) {
-  $activePlayers.forEach($player => $("progress", $player).attr("max", value))
+function updatePlayerScore(event, data) {
+  playerScores[data.playerNb] = data.score
+  console.log(playerScores)
+  updateScores()
+}
+
+// function updateMaxScore() {
+//   const max = getMaxScore()
+//   $activePlayers.forEach($player => $("progress", $player).attr("max", max))
+// }
+
+/**
+ * Returns the greater current score among all active players
+ */
+function getMaxScore() {
+  return _.max(playerScores)
 }

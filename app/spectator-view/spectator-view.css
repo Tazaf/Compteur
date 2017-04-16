@@ -15,14 +15,62 @@ main {
 }
 
 div.player-result {
-  padding: 10px;
-  background-color: white;
   margin: 5px;
   display: flex;
   align-items: center;
 }
-
-progress {
-  display: inline-block;
+span.score-display {
+  background-color: #ff6e40;
+  border-radius: 3px;
+  width: 60px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 25px;
+  color: white;
+  position: absolute;
+  left: -30px;
+  top: -58px;
+}
+span.score-display:before {
+  width: 0;
+  height: 0;
+  content: " ";
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
+  border-top: 10px solid #ff6e40;
+  position: absolute;
+  top: 100%;
+  /* right: 22px; */
+}
+span.score-display:after {
+  width: 19px;
+  height: 19px;
+  content: " ";
+  position: absolute;
+  top: 54px;
+  border-radius: 50px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  background-color: #ff3d00;
+  left: 20px;
+}
+div.player-result div.outer-score {
+  background-color: #eceff1;
   flex: 1;
+  height: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 50px;
+  margin: 0 50px;
+}
+div.player-result div.inner-score {
+  background-color: #ff6e40;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  border-radius: 50px;
 }
