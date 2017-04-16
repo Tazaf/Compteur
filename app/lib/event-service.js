@@ -4,6 +4,8 @@ const nbPlayerSelected = 'nb-player-selected'
 const addNewPlayer = 'add-new-player'
 const enableNewPlayerMenuItem = 'enable-new-player-menu-item'
 const disableNewPlayerMenuItem = 'disable-new-player-menu-item'
+const updatePlayerName = 'update-player-name'
+const updatePlayerScore = 'update-player-score'
 
 module.exports = {
   nbPlayerModal,
@@ -11,5 +13,7 @@ module.exports = {
   nbPlayerSelected,
   addNewPlayer,
   enableNewPlayerMenuItem,
-  disableNewPlayerMenuItem
+  disableNewPlayerMenuItem,
+  updatePlayerName,
+  updatePlayerScore
 }

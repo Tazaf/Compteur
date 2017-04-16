@@ -19,7 +19,8 @@ exports.createNbPlayersModal = createNbPlayersModal
 function createGameMasterView() {
   wins.gmView = new BrowserWindow({
     width: 800,
-    height: 600
+    height: 600,
+    backgroundColor: '#cfd8dc'
   })
   wins.gmView.webContents.openDevTools()
   wins.gmView.on('closed', () => {
@@ -44,7 +45,8 @@ function createSpectatorView(closeCallback) {
     height: 260,
     title: "Vue spectateur"
   })
-  wins.spectator.setMenu(null)
+  // wins.spectator.setMenu(null)
+  wins.spectator.webContents.openDevTools()
   wins.spectator.on('close', closeCallback)
   wins.spectator.loadURL(url.format({
     pathname: path.join(__dirname, '..', 'spectator-view', 'spectator-view.html'),

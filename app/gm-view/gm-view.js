@@ -23,7 +23,8 @@ const maxNbPlayer = 10
 // A jQuery object representing the HTML game zone
 const $gameZone = $("#game")
 // Cache for the jQuery objects representing each Player Cards
-let activePlayers = []
+let $activePlayers = []
+let playerScores = []
 
 /* ----- INTERNAL EVENTS ----- */
 
@@ -40,18 +41,27 @@ $gameZone.on({
   'mouseup': resolveModifier
 }, 'button')
 
-$gameZone.on('keydown', 'input', _.debounce(toggleModifierButtons, 250))
+$gameZone.on('keydown', 'input', _.debounce(updatePlayerName, 250))
 
 /* ----- FUNCTION DECLARATIONS ----- */
+
+function updatePlayerName() {
+  const value = $(this).val()
+  const playerNb = $(this).attr('id')
+  ipc.send(events.updatePlayerName, {
+    playerNb,
+    value
+  })
+  toggleModifierButtons(value, $(this))
+}
 
 /**
  * Hide or show the modifier buttons depending on the value of their related input.
  * If the player name's input has a value, then the buttons are enabled.
  * If it has no value, the buttons are disabled.
  */
-function toggleModifierButtons() {
-  const value = $(this).val()
-  const $buttons = $("button", $(this).closest('div.player-card'))
+function toggleModifierButtons(value, $ele) {
+  const $buttons = $("button", $ele.closest('div.player-card'))
   value !== "" ? $buttons.removeClass('disabled') : $buttons.addClass('disabled')
 }
 
@@ -81,11 +91,13 @@ function initiateAutoIncrement() {
 
 /**
  * Creates a new game, creating as many new payers as indicated by the nbPlayer argument.
+ * When doing so, the #game HTML element is emptied, as is the activePlayers array.
  * @param {*} event The event that triggers the call to this function.
  * @param {*} nbPlayer The number of players to create on this new game.
  */
 function createNewGame(event, nbPlayer) {
   $gameZone.empty()
+  $activePlayers = []
   playerCard.getTemplate()
     .then(template => {
       for (let i = 1; i <= nbPlayer; i++) {
@@ -93,7 +105,7 @@ function createNewGame(event, nbPlayer) {
       }
       $('#no-game').addClass('hide')
       $gameZone.removeClass('hide')
-      $("input", activePlayers[0]).focus()
+      $("input", $activePlayers[1]).focus()
       ipc.send(events.enableNewPlayerMenuItem)
     })
 }
@@ -106,9 +118,9 @@ function createNewGame(event, nbPlayer) {
  */
 function addNewPlayerCard(template, playerNb) {
   const $player = $(template)
-  $("input", $player).attr('id', `player${playerNb}`)
-  $("label", $player).attr('for', `player${playerNb}`).text(`Joueur ${playerNb}`)
-  activePlayers.push($player)
+  $("input", $player).attr('id', playerNb)
+  $("label", $player).attr('for', playerNb).text(`Joueur ${playerNb}`)
+  $activePlayers[playerNb] = $player
   $gameZone.append($player)
 }
 
@@ -116,18 +128,20 @@ function addNewPlayerCard(template, playerNb) {
  * If possible, creates a new player in the current game.
  * This action will do nothing if there is no current game
  * or that the maximum number of players is reached.
+ * When adding the last possible player, the corresponding menu item will be disabled.
  */
 function createNewPlayer() {
-  const newPlayerNb = activePlayers.length + 1
+  const newPlayerNb = $activePlayers.length
   if (newPlayerNb === 1 || newPlayerNb > maxNbPlayer) return
   playerCard.getTemplate()
     .then((template) => {
       addNewPlayerCard(template, newPlayerNb)
-      $("input", activePlayers[newPlayerNb]).focus()
+      $("input", $activePlayers[newPlayerNb]).focus()
+      newPlayerNb === maxNbPlayer && ipc.send(events.disableNewPlayerMenuItem)
     })
 }
 
-/**
+/**s
  * Retrieves the correct modifiers to apply to a player's score, based on the given $ele.
  * $ele should be a button with either the .plus or .minus class and either the .one or .two classes.
  * The modifier will be generated based on the combination of these classes
@@ -152,12 +166,21 @@ function getModifierFromButton($ele) {
  */
 function changeScore($ele, modifier) {
   const $player = $ele.closest('div.player-card')
+  const playerNb = $("input", $player).attr('id')
   const $score = $("h1.value", $player)
   let score = parseInt($score.text())
   score += modifier
+
   score < 0 && (score = 0)
   score > 999 && (score = 999)
+
   $score.text(score)
+  playerScores[playerNb] = score
+  ipc.send(events.updatePlayerScore, {
+    playerNb,
+    score,
+    maxScore: getMaxScore()
+  })
 }
 
 /**
@@ -170,4 +193,8 @@ function changeScore($ele, modifier) {
 function autoIncrement($ele) {
   const modifier = getModifierFromButton($ele)
   holdActive = setInterval(() => changeScore($ele, modifier), autoIncrementDelay)
+}
+
+function getMaxScore() {
+  return _.max(playerScores)
 }

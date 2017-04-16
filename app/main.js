@@ -5,6 +5,7 @@ const Menu = electron.Menu
 const globalShortcut = electron.globalShortcut
 const dialog = electron.dialog
 const ipc = electron.ipcMain
+const NativeImage = electron.nativeImage
 const path = require('path')
 const url = require('url')
 const events = require(path.join(__dirname, 'lib', 'event-service.js'))
@@ -31,6 +32,7 @@ app.on('ready', function () {
   registerShortcuts()
   WindowsManager.createGameMasterView()
   WindowsManager.createSpectatorView(closeSpectatorView)
+  toggleSpectatorView()
 })
 
 // Quit when all windows are closed.
@@ -60,11 +62,19 @@ ipc.on(events.nbPlayerModalClose, () => wins.nbPlayer.close())
 ipc.on(events.nbPlayerSelected, (event, args) => {
   wins.nbPlayer.close()
   wins.gmView.webContents.send(events.nbPlayerSelected, args)
+  wins.spectator.webContents.send(events.nbPlayerSelected, args)
 })
 
 ipc.on(events.enableNewPlayerMenuItem, () => {
   getNewPlayerMenuItem().enabled = true
 })
+
+ipc.on(events.disableNewPlayerMenuItem, () => {
+  getNewPlayerMenuItem().enabled = false
+})
+
+ipc.on(events.updatePlayerName, (event, args) => wins.spectator.webContents.send(events.updatePlayerName, args))
+ipc.on(events.updatePlayerScore, (event, args) => wins.spectator.webContents.send(events.updatePlayerScore, args))
 
 /* ----- FUNCTIONS DECLARATIONS ----- */
 
@@ -87,10 +97,12 @@ function AppMenu() {
       submenu: [
         {
           label: 'Nouvelle partie',
+          icon: path.join(__dirname, 'assets', 'material-icons-font', 'icons', 'ic_add_black_18dp_1x.png'),
           accelerator: 'CmdOrCtrl+N',
           click: showNbPlayersModal
         }, { type: 'separator' }, {
           label: 'Ajouter un joueur',
+          icon: path.join(__dirname, 'assets', 'material-icons-font', 'icons', 'ic_person_add_black_18dp.png'),
           id: 'add-new-player',
           accelerator: 'CmdOrCtrl+J',
           enabled: false,
@@ -98,14 +110,32 @@ function AppMenu() {
         }
       ]
     }, {
-      label: "Vue",
+      label: "Vue Spectateur",
       submenu: [
         {
-          label: 'Vue spectateur',
+          label: 'Afficher',
           id: 'spectator-view',
           type: 'checkbox',
           accelerator: 'Alt+S',
           click: toggleSpectatorView
+        }, { type: 'separator' }, {
+          label: 'Trier les joueurs...',
+          icon: path.join(__dirname, 'assets', 'material-icons-font', 'icons', 'ic_sort_black_18dp_1x.png'),
+          submenu: [
+            {
+              label: "Par ordre alphabétique ascendant",
+              type: 'radio'
+            }, {
+              label: "Par ordre alphabétique desendant",
+              type: 'radio'
+            }, {
+              label: "Par nombre de points croissant",
+              type: 'radio'
+            }, {
+              label: "Par nombre de points décroissant",
+              type: 'radio'
+            }
+          ]
         }
       ]
     }, {
@@ -115,7 +145,7 @@ function AppMenu() {
       label: 'Debug',
       submenu: [
         { role: 'toggledevtools' },
-        { role: 'forcereload' }
+        { role: 'reload' }
       ]
     }
   ]
@@ -136,6 +166,7 @@ function showNbPlayersModal() {
  */
 function addNewPlayer() {
   wins.gmView.webContents.send(events.addNewPlayer)
+  wins.spectator.webContents.send(events.addNewPlayer)
 }
 
 /**
