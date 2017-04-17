@@ -7,11 +7,24 @@ main {
   right: 0;
 }
 
+#no-game {
+  height: 100%;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
 #results {
   height: 100%;
   display: flex;
-  flex-direction: column;
   justify-content: space-around;
+}
+main.horizontal #results {
+  flex-direction: column;
+}
+main.vertical #results {
+  flex-direction: row;
 }
 
 div.player-result {
@@ -19,6 +32,13 @@ div.player-result {
   display: flex;
   align-items: center;
 }
+main.horizontal div.player-result {
+  flex-direction: row;
+}
+main.vertical div.player-result {
+  flex-direction: column-reverse;
+}
+
 span.score-display {
   background-color: #ff6e40;
   border-radius: 3px;
