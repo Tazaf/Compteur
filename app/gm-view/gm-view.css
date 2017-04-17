@@ -26,7 +26,7 @@ main {
 #new-player-button {
   height: 120px;
   margin-top: .5rem;
-  border: 1px dotted #ff9e80;
+  border: 2px dashed #ff9e80;
   border-radius: 5px;
   display: flex;
   justify-content: center;
