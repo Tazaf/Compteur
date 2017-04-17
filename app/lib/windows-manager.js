@@ -22,7 +22,7 @@ function createGameMasterView() {
     height: 600,
     backgroundColor: '#cfd8dc'
   })
-  wins.gmView.webContents.openDevTools()
+  // wins.gmView.webContents.openDevTools()
   wins.gmView.on('closed', () => {
     wins.gmView = null
   })
@@ -48,7 +48,7 @@ function createSpectatorView(closeCallback) {
     title: "Vue spectateur"
   })
   wins.spectator.setMenu(null)
-  wins.spectator.webContents.openDevTools()
+  // wins.spectator.webContents.openDevTools()
   wins.spectator.on('close', closeCallback)
   wins.spectator.loadURL(url.format({
     pathname: path.join(__dirname, '..', 'spectator-view', 'spectator-view.html'),

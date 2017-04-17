@@ -13,6 +13,11 @@ const $main = $("main")
 let viewType = Settings.HORIZONTAL_VIEW_TYPE
 let $activePlayers = []
 let playerScores = []
+let maxScore
+
+let animateScore = {}
+animateScore[Settings.VERTICAL_VIEW_TYPE] = animateVerticalScore
+animateScore[Settings.HORIZONTAL_VIEW_TYPE] = animateHorizontalScore
 
 /* ----- INTERNAL EVENTS ----- */
 
@@ -72,40 +77,51 @@ function updatePlayerName(event, data) {
   $playerName.text(data.value || `Joueur ${data.playerNb}`)
 }
 
-function updateAllScores() {
-  const max = getMaxScore()
-  $activePlayers.forEach($player => {
-    const playerNb = $player.attr('id')
-    $("span.score-display", $player).text(playerScores[playerNb])
-    const ratio = playerScores[playerNb] * 100 / max
-    !isNaN(ratio && animateScore($player, ratio))
-  })
+function updateAllPlayerResults() {
+  $activePlayers.forEach(updatePlayerResult)
 }
 
-function animateScore($player, ratio) {
-  if (viewType === Settings.HORIZONTAL_VIEW_TYPE) {
-    $("div.inner-score", $player).animate({ width: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
-    $("div.score-wrapper", $player).animate({ left: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
-  } else if (viewType === Settings.VERTICAL_VIEW_TYPE) {
-    $("div.inner-score", $player).animate({ height: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
-    $("div.score-wrapper", $player).animate({ bottom: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
-  }
+function updatePlayerResult($player) {
+  const playerNb = $player.attr('id')
+  $("span.score-display", $player).text(playerScores[playerNb])
+  const ratio = playerScores[playerNb] === 0 ? 0 : playerScores[playerNb] * 100 / maxScore
+  !isNaN(ratio) && animateScore[viewType]($player, ratio)
+}
+
+function animateVerticalScore($player, ratio) {
+  $("div.inner-score", $player).animate({ height: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
+  $("div.score-wrapper", $player).animate({ bottom: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
+}
+
+function animateHorizontalScore($player, ratio) {
+  $("div.inner-score", $player).animate({ width: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
+  $("div.score-wrapper", $player).animate({ left: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
 }
 
 function updatePlayerScore(event, data) {
   playerScores[data.playerNb] = data.score
-  updateAllScores()
+  updateMaxScore()
+  updateAllPlayerResults()
+}
+
+function switchDisplay() {
+  $activePlayers.forEach($player => {
+    $("div.inner-score", $player).removeAttr('style')
+    $("div.score-wrapper", $player).removeAttr('style')
+    updatePlayerResult($player)
+  })
 }
 
 /**
  * Returns the greater current score among all active players
  */
-function getMaxScore() {
-  return _.max(playerScores)
+function updateMaxScore() {
+  maxScore = _.max(playerScores)
 }
 
 function setViewType(displayType) {
   if (viewType === displayType) return
   viewType = displayType
   $main.attr('class', viewType)
+  switchDisplay()
 }

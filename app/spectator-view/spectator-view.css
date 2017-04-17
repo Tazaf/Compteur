@@ -86,7 +86,7 @@ span.score-display:after {
   position: absolute;
   border-radius: 2px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-  background-color: #ff3d00;
+  background-color: #ff6e40  ;
 }
 main.vertical span.score-display:after {
   width: 20px;
@@ -121,7 +121,7 @@ main.vertical div.outer-score {
 }
 
 div.inner-score {
-  background-color: #ff6e40;
+  background-color: #ff9e80;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -145,4 +145,8 @@ main.vertical div.score-wrapper {
 }
 main.horizontal div.score-wrapper {
   align-items: center;
+}
+
+div.player-position {
+  opacity: 0;
 }

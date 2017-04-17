@@ -33,7 +33,7 @@ app.on('ready', function () {
   registerShortcuts()
   WindowsManager.createGameMasterView()
   WindowsManager.createSpectatorView(closeSpectatorView)
-  toggleSpectatorView()
+  // toggleSpectatorView()
 })
 
 // Quit when all windows are closed.
