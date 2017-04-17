@@ -9,19 +9,16 @@ const Menu = electron.remote.Menu
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
 const playerCard = require(path.join(__dirname, '..', 'player-card', 'player-card.module.js'))
 const getMenuItem = require(path.join(__dirname, '..', 'lib', 'get-menu-item.js'))
+const Settings = require(path.join(__dirname, '..', 'lib', 'settings-constants.js'))
 
-// The number of milliseconds to wait before a click is considered a hold
-const holdDelay = 500
 // Global variable to store the reference to the setTimeout that will trigger the click-hold event
 let holdPending
 // Global variable to store the reference to the setInterval responsible for the autoincrementation of the score
 let holdActive
-// The interval, in milliseconds, between each score automatic incrementation
-const autoIncrementDelay = 100
-// Maximum number of players in a game
-const maxNbPlayer = 10
 // A jQuery object representing the HTML game zone
 const $playersZone = $("#players")
+// A jQuery object representing the add new player button
+const $addNewPlayerBtn = $("#add-new-player")
 // Cache for the jQuery objects representing each Player Cards
 let $activePlayers = []
 
@@ -35,7 +32,7 @@ ipc.on(events.addNewPlayer, createNewPlayer)
 
 $("a#new-counter").click(() => ipc.send(events.nbPlayerModal))
 
-$("#add-new-player").click(createNewPlayer)
+$addNewPlayerBtn.click(() => ipc.send(events.addNewPlayer))
 
 $playersZone.on({
   'mousedown': initiateAutoIncrement,
@@ -87,7 +84,7 @@ function resolveModifier() {
  * The holdPending global variable will store the reference to the created timeout.
  */
 function initiateAutoIncrement() {
-  holdPending = setTimeout(() => autoIncrement($(this)), holdDelay)
+  holdPending = setTimeout(() => autoIncrement($(this)), Settings.HOLD_DELAY)
 }
 
 /**
@@ -97,9 +94,9 @@ function initiateAutoIncrement() {
  * @param {*} nbPlayer The number of players to create on this new game.
  */
 function createNewGame(event, nbPlayer) {
-  $("#add-new-player").removeClass('hide')
-  $playersZone.empty()
-  $activePlayers = []
+  nbPlayer = parseInt(nbPlayer)
+  resetGameMasterView()
+  nbPlayer === Settings.NB_PLAYERS_MAX && $addNewPlayerBtn.addClass('hide')
   playerCard.getTemplate()
     .then(template => {
       for (let i = 1; i <= nbPlayer; i++) {
@@ -134,15 +131,15 @@ function addNewPlayerCard(template, playerNb) {
  */
 function createNewPlayer() {
   const newPlayerNb = $activePlayers.length
-  if (newPlayerNb === 1 || newPlayerNb > maxNbPlayer) return
+  if (newPlayerNb === 1 || newPlayerNb > Settings.NB_PLAYERS_MAX) return
   playerCard.getTemplate()
     .then((template) => {
       addNewPlayerCard(template, newPlayerNb)
       $("input", $activePlayers[newPlayerNb]).focus()
-      newPlayerNb === maxNbPlayer && ipc.send(events.disableNewPlayerMenuItem)
     })
-  if (newPlayerNb === maxNbPlayer) {
-    $("#add-new-player").addClass('hide')
+  if (newPlayerNb === Settings.NB_PLAYERS_MAX) {
+    ipc.send(events.disableNewPlayerMenuItem)
+    $addNewPlayerBtn.addClass('hide')
   }
 }
 
@@ -196,4 +193,10 @@ function changeScore($ele, modifier) {
 function autoIncrement($ele) {
   const modifier = getModifierFromButton($ele)
   holdActive = setInterval(() => changeScore($ele, modifier), autoIncrementDelay)
+}
+
+function resetGameMasterView() {
+  $addNewPlayerBtn.removeClass('hide')
+  $playersZone.empty()
+  $activePlayers = []
 }
