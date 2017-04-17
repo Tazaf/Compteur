@@ -4,6 +4,7 @@ const _ = require('lodash')
 const ipc = electron.ipcRenderer
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
 const playerResult = require(path.join(__dirname, '..', 'player-result', 'player-result.module.js'))
+const Settings = require(path.join(__dirname, '..', 'lib', 'settings-constants.js'))
 
 const $resultZone = $("#results")
 
@@ -18,7 +19,7 @@ ipc.on(events.updatePlayerName, updatePlayerName)
 
 ipc.on(events.updatePlayerScore, updatePlayerScore)
 
-ipc.on(events.addNewPlayer, () => console.log('new player'))
+ipc.on(events.addNewPlayer, addNewPlayer)
 
 /* ----- FUNCTION DECLARATIONS ----- */
 
@@ -36,6 +37,16 @@ function reflectNewGame(event, nbPlayer) {
     })
 }
 
+function addNewPlayer() {
+  const nbPlayer = $activePlayers.length
+  if (nbPlayer <= Settings.NB_PLAYERS_MAX) {
+    playerResult.getTemplate()
+      .then(template => {
+        addNewPlayerResultComponent(template, nbPlayer)
+      })
+  }
+}
+
 function addNewPlayerResultComponent(template, nbPlayer) {
   const $result = $(template)
   $result.attr('id', nbPlayer)
@@ -50,32 +61,26 @@ function updatePlayerName(event, data) {
   $playerName.text(data.value || `Joueur ${data.playerNb}`)
 }
 
-function updateScores() {
+function updateAllScores() {
   const max = getMaxScore()
   $activePlayers.forEach($player => {
     const playerNb = $player.attr('id')
     const $bar = $("div.inner-score", $player)
     const $score = $("span.score-display", $player)
     $score.text(playerScores[playerNb])
-    const ratio = playerScores[playerNb] * 100 /max
+    const ratio = playerScores[playerNb] * 100 / max
     console.log(playerNb, $bar, $score, playerScores[playerNb], ratio)
     if (!isNaN(ratio)) {
-      $bar.animate({width: `${ratio}%`}, 150)
-      $score.animate({'margin-left': `${ratio}%`}, 150)
+      $bar.animate({ width: `${ratio}%` }, 150)
+      $score.animate({ 'margin-left': `${ratio}%` }, 150)
     }
   })
 }
 
 function updatePlayerScore(event, data) {
   playerScores[data.playerNb] = data.score
-  console.log(playerScores)
-  updateScores()
+  updateAllScores()
 }
-
-// function updateMaxScore() {
-//   const max = getMaxScore()
-//   $activePlayers.forEach($player => $("progress", $player).attr("max", max))
-// }
 
 /**
  * Returns the greater current score among all active players

@@ -76,6 +76,8 @@ ipc.on(events.disableNewPlayerMenuItem, () => {
 ipc.on(events.updatePlayerName, (event, args) => wins.spectator.webContents.send(events.updatePlayerName, args))
 ipc.on(events.updatePlayerScore, (event, args) => wins.spectator.webContents.send(events.updatePlayerScore, args))
 
+ipc.on(events.addNewPlayer, addNewPlayer)
+
 /* ----- FUNCTIONS DECLARATIONS ----- */
 
 /**

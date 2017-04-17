@@ -6,6 +6,20 @@ const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
 const $choiceList = $('#choice-list')
 // A jQuery object representing the OK button
 const $okBtn = $('#ok')
+// A jQuery object representing the cancel button
+const $cancelBtn = $("#cancel")
+
+// Key constant used to detect key strokes
+const KEYS = {
+  PRESS: {
+    NUM_1: 48,
+    NUM_9: 57,
+  },
+  DOWN: {
+    ENTER: 13,
+    ESC: 27
+  }
+}
 
 // The number of players to create for the new game
 let nbPlayers
@@ -17,10 +31,11 @@ let keyBufferValue = ''
 /* ----- TEMPLATE EVENTS ----- */
 
 $(document).keypress(startKeyBuffer)
+$(document).keydown(detectActionKey)
 
-$('#cancel').click(() => ipc.send(events.nbPlayerModalClose))
+$cancelBtn.click(() => ipc.send(events.nbPlayerModalClose))
 
-$('#ok').click(() => ipc.send(events.nbPlayerSelected, nbPlayers))
+$okBtn.click(() => ipc.send(events.nbPlayerSelected, nbPlayers))
 
 $('li', $choiceList).click(selectChoice)
 
@@ -69,16 +84,25 @@ function selectNbPlayerWithKeyboard() {
   keyBufferValue = ''
 }
 
+function detectActionKey(event) {
+  console.log(event.which, event.keyCode)
+  if (event.which === KEYS.DOWN.ESC) {
+    $cancelBtn.click()
+  } else if (event.which === KEYS.DOWN.ENTER) {
+    !$okBtn.hasClass('disabled') && $okBtn.click()
+  }
+}
+
 /**
  * Starts listening to keystrokes and catching them if they match the excpected key.
  * This means that the buffer is only started if the user press numbered keys.
  * @param {*} event The event fired
  */
 function startKeyBuffer(event) {
-  if ((event.which >= 48 && event.which <= 57) || (event.which >= 96 && event.which <= 105)) {
+  console.log(event.which, event.keyCode)
+  if (event.which >= KEYS.PRESS.NUM_1 && event.which <= KEYS.PRESS.NUM_9) {
     keyBufferValue += String.fromCharCode(event.keyCode)
-    console.log(keyBufferValue)
     keyBuffer && clearTimeout(keyBuffer)
-    keyBuffer = setTimeout(selectNbPlayerWithKeyboard, 250)
+    keyBuffer = setTimeout(selectNbPlayerWithKeyboard, 200)
   }
 }
