@@ -3,15 +3,18 @@ const electron = require('electron')
 const _ = require('lodash')
 const ipc = electron.ipcRenderer
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
-const playerResult = require(path.join(__dirname, '..', 'player-result', 'player-result.module.js'))
+const Components = require(path.join(__dirname, '..', 'components', 'components-module.js'))
 const Settings = require(path.join(__dirname, '..', 'lib', 'settings-constants.js'))
 
 const $resultZone = $("#results")
+const $noGame = $("#no-game")
 
 let $activePlayers = []
 let playerScores = []
 
 /* ----- INTERNAL EVENTS ----- */
+
+$noGame.on('click', '#new-counter', () => ipc.send(events.nbPlayerModal))
 
 ipc.on(events.nbPlayerSelected, reflectNewGame)
 
@@ -21,18 +24,20 @@ ipc.on(events.updatePlayerScore, updatePlayerScore)
 
 ipc.on(events.addNewPlayer, addNewPlayer)
 
+Components.getNoGameMessage().then(template => $noGame.append(template))
+
 /* ----- FUNCTION DECLARATIONS ----- */
 
 function reflectNewGame(event, nbPlayer) {
   $resultZone.empty()
   $activePlayers = []
   playerScores = []
-  playerResult.getTemplate()
+  Components.getPlayerResult()
     .then(template => {
       for (let i = 1; i <= nbPlayer; i++) {
         addNewPlayerResultComponent(template, i)
       }
-      $('#no-results').addClass('hide')
+      $noGame.addClass('hide')
       $resultZone.removeClass('hide')
     })
 }
@@ -40,7 +45,7 @@ function reflectNewGame(event, nbPlayer) {
 function addNewPlayer() {
   const nbPlayer = $activePlayers.length
   if (nbPlayer <= Settings.NB_PLAYERS_MAX) {
-    playerResult.getTemplate()
+    Components.getPlayerResult()
       .then(template => {
         addNewPlayerResultComponent(template, nbPlayer)
       })

@@ -7,7 +7,7 @@ const ipc = electron.ipcRenderer
 const BrowserWindow = electron.BrowserWindow
 const Menu = electron.remote.Menu
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
-const playerCard = require(path.join(__dirname, '..', 'player-card', 'player-card.module.js'))
+const Components = require(path.join(__dirname, '..', 'components', 'components-module.js'))
 const getMenuItem = require(path.join(__dirname, '..', 'lib', 'get-menu-item.js'))
 const Settings = require(path.join(__dirname, '..', 'lib', 'settings-constants.js'))
 
@@ -19,6 +19,7 @@ let holdActive
 const $playersZone = $("#players")
 // A jQuery object representing the add new player button
 const $addNewPlayerBtn = $("#add-new-player")
+const $noGame = $('#no-game')
 // Cache for the jQuery objects representing each Player Cards
 let $activePlayers = []
 
@@ -30,7 +31,7 @@ ipc.on(events.addNewPlayer, createNewPlayer)
 
 /* ----- TEMPLATE EVENTS ----- */
 
-$("a#new-counter").click(() => ipc.send(events.nbPlayerModal))
+$noGame.on('click', '#new-counter', () => ipc.send(events.nbPlayerModal))
 
 $addNewPlayerBtn.click(() => ipc.send(events.addNewPlayer))
 
@@ -40,6 +41,8 @@ $playersZone.on({
 }, 'button')
 
 $playersZone.on('keydown', 'input', _.debounce(updatePlayerName, 150))
+
+Components.getNoGameMessage().then(template => $noGame.append(template))
 
 /* ----- FUNCTION DECLARATIONS ----- */
 
@@ -97,12 +100,12 @@ function createNewGame(event, nbPlayer) {
   nbPlayer = parseInt(nbPlayer)
   resetGameMasterView()
   nbPlayer === Settings.NB_PLAYERS_MAX && $addNewPlayerBtn.addClass('hide')
-  playerCard.getTemplate()
+  Components.getPlayerCard()
     .then(template => {
       for (let i = 1; i <= nbPlayer; i++) {
         addNewPlayerCard(template, i)
       }
-      $('#no-game').addClass('hide')
+      $noGame.addClass('hide')
       $("#game").removeClass('hide')
       $("input", $activePlayers[1]).focus()
       ipc.send(events.enableNewPlayerMenuItem)
@@ -132,7 +135,7 @@ function addNewPlayerCard(template, playerNb) {
 function createNewPlayer() {
   const newPlayerNb = $activePlayers.length
   if (newPlayerNb === 1 || newPlayerNb > Settings.NB_PLAYERS_MAX) return
-  playerCard.getTemplate()
+  Components.getPlayerCard()
     .then((template) => {
       addNewPlayerCard(template, newPlayerNb)
       $("input", $activePlayers[newPlayerNb]).focus()
