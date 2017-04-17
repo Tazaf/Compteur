@@ -39,11 +39,10 @@ function createGameMasterView() {
  */
 function createSpectatorView(closeCallback) {
   wins.spectator = new BrowserWindow({
-    parent: wins.gmView,
     show: false,
     width: 800,
     height: 600,
-    skipTaskbar: true,
+    skipTaskbar: false,
     backgroundColor: '#546e7a',
     title: "Vue spectateur"
   })
