@@ -195,9 +195,15 @@ function changeScore($ele, modifier) {
  */
 function autoIncrement($ele) {
   const modifier = getModifierFromButton($ele)
-  holdActive = setInterval(() => changeScore($ele, modifier), autoIncrementDelay)
+  holdActive = setInterval(() => changeScore($ele, modifier), Settings.AUTO_INCREMENT_DELAY)
 }
 
+/**
+ * Reset the Game Master View.
+ * This means wiping out any active player in the $playersZone,
+ * and their respective reference in the $activePlayers array,
+ * plus hiding the button that adds a new player.
+ */
 function resetGameMasterView() {
   $addNewPlayerBtn.removeClass('hide')
   $playersZone.empty()

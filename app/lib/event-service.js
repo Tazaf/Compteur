@@ -6,6 +6,7 @@ const enableNewPlayerMenuItem = 'enable-new-player-menu-item'
 const disableNewPlayerMenuItem = 'disable-new-player-menu-item'
 const updatePlayerName = 'update-player-name'
 const updatePlayerScore = 'update-player-score'
+const changeDisplayType = 'change-display-type'
 
 module.exports = {
   nbPlayerModal,
@@ -15,5 +16,6 @@ module.exports = {
   enableNewPlayerMenuItem,
   disableNewPlayerMenuItem,
   updatePlayerName,
-  updatePlayerScore
+  updatePlayerScore,
+  changeDisplayType
 }

@@ -11,6 +11,7 @@ const url = require('url')
 const events = require(path.join(__dirname, 'lib', 'event-service.js'))
 const getMenuItem = require(path.join(__dirname, 'lib', 'get-menu-item.js'))
 const WindowsManager = require(path.join(__dirname, 'lib', 'windows-manager.js'))
+const Settings = require(path.join(__dirname, 'lib', 'settings-constants.js'))
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -18,7 +19,7 @@ let wins = WindowsManager.repository
 
 // Cache for Menu Item
 let CacheMenuItems = {
-  spectatorView: undefined,
+  spectatorViewOn: undefined,
   newPlayer: undefined
 }
 
@@ -87,6 +88,9 @@ function registerShortcuts() {
   globalShortcut.register('CmdOrCtrl+N', showNbPlayersModal)
   globalShortcut.register('CmdOrCtrl+J', addNewPlayer)
   globalShortcut.register('Alt+S', toggleSpectatorView)
+  globalShortcut.register('Alt+F11', toggleSpectatorViewFullScreen)
+  globalShortcut.register('Alt+V', setVerticalDisplay)
+  globalShortcut.register('Alt+H', setHorizontalDisplay)
 }
 
 /**
@@ -96,6 +100,7 @@ function AppMenu() {
   const menuTemplate = [
     {
       label: 'Partie',
+      id: 'game',
       submenu: [
         {
           label: 'Nouvelle partie',
@@ -116,12 +121,51 @@ function AppMenu() {
       submenu: [
         {
           label: 'Afficher',
-          id: 'spectator-view',
-          type: 'checkbox',
+          id: 'spectator-view-on',
+          icon: path.join(__dirname, 'assets', 'material-icons-font', 'icons', 'ic_visibility_black_18dp_1x.png'),
           accelerator: 'Alt+S',
           click: toggleSpectatorView
+        }, {
+          label: 'Cacher',
+          id: 'spectator-view-off',
+          icon: path.join(__dirname, 'assets', 'material-icons-font', 'icons', 'ic_visibility_off_black_18dp_1x.png'),
+          accelerator: 'Alt+S',
+          click: toggleSpectatorView,
+          visible: false
+        }, {
+          label: 'Plein écran',
+          id: 'full-screen-on',
+          icon: path.join(__dirname, 'assets', 'material-icons-font', 'icons', 'ic_fullscreen_black_18dp_1x.png'),
+          accelerator: 'Alt+F11',
+          click: toggleSpectatorViewFullScreen
+        }, {
+          label: 'Plein écran',
+          id: 'full-screen-off',
+          icon: path.join(__dirname, 'assets', 'material-icons-font', 'icons', 'ic_fullscreen_exit_black_18dp_1x.png'),
+          accelerator: 'Alt+F11',
+          click: toggleSpectatorViewFullScreen,
+          visible: false
+        }, { type: 'separator' }, {
+          label: 'Affichage...',
+          submenu: [
+            {
+              label: 'Horizontal',
+              id: 'horizontal-display',
+              type: 'radio',
+              accelerator: 'Alt+H',
+              click: setHorizontalDisplay,
+              checked: true
+            }, {
+              label: 'Vertical',
+              id: 'vertical-display',
+              type: 'radio',
+              accelerator: 'Alt+V',
+              click: setVerticalDisplay
+            }
+          ]
         }, { type: 'separator' }, {
           label: 'Trier les joueurs...',
+          enabled: false,
           icon: path.join(__dirname, 'assets', 'material-icons-font', 'icons', 'ic_sort_black_18dp_1x.png'),
           submenu: [
             {
@@ -177,10 +221,28 @@ function addNewPlayer() {
 function toggleSpectatorView() {
   if (wins.spectator.isVisible()) {
     wins.spectator.hide()
-    getSpectatorViewMenuItem().checked = false
+    getSpectatorViewOnMenuItem().visible = true
+    getSpectatorViewOffMenuItem().visible = false
   } else {
     wins.spectator.show()
-    getSpectatorViewMenuItem().checked = true
+    getSpectatorViewOnMenuItem().visible = false
+    getSpectatorViewOffMenuItem().visible = true
+  }
+}
+
+/**
+ * Either activate or deactivate full screen display for the Spectator View.
+ * Change the menu items accordingly.
+ */
+function toggleSpectatorViewFullScreen() {
+  if (wins.spectator.isFullScreen()) {
+    wins.spectator.setFullScreen(false)
+    getFullScreenOnMenuItem().visible = true
+    getFullScreenOffMenuItem().visible = false
+  } else {
+    wins.spectator.setFullScreen(true)
+    getFullScreenOnMenuItem().visible = false
+    getFullScreenOffMenuItem().visible = true
   }
 }
 
@@ -188,12 +250,52 @@ function toggleSpectatorView() {
  * Returns the menu item related to showing the Spectator View.
  * The function caches the reference to the Menu Item object, for subsequent calls.
  */
-function getSpectatorViewMenuItem() {
-  if (!CacheMenuItems.spectatorView) {
+function getSpectatorViewOnMenuItem() {
+  if (!CacheMenuItems.spectatorViewOn) {
     const AppMenu = Menu.getApplicationMenu()
-    CacheMenuItems.spectatorView = getMenuItem.byId('spectator-view', AppMenu)
+    CacheMenuItems.spectatorViewOn = getMenuItem.byId('spectator-view-on', AppMenu)
   }
-  return CacheMenuItems.spectatorView
+  return CacheMenuItems.spectatorViewOn
+}
+
+function getSpectatorViewOffMenuItem() {
+  if (!CacheMenuItems.spectatorViewOff) {
+    const AppMenu = Menu.getApplicationMenu()
+    CacheMenuItems.spectatorViewOff = getMenuItem.byId('spectator-view-off', AppMenu)
+  }
+  return CacheMenuItems.spectatorViewOff
+}
+
+function getFullScreenOnMenuItem() {
+  if (!CacheMenuItems.fullScreenOn) {
+    const AppMenu = Menu.getApplicationMenu()
+    CacheMenuItems.fullScreenOn = getMenuItem.byId('full-screen-on', AppMenu)
+  }
+  return CacheMenuItems.fullScreenOn
+}
+
+function getFullScreenOffMenuItem() {
+  if (!CacheMenuItems.fullScreenOff) {
+    const AppMenu = Menu.getApplicationMenu()
+    CacheMenuItems.fullScreenOff = getMenuItem.byId('full-screen-off', AppMenu)
+  }
+  return CacheMenuItems.fullScreenOff
+}
+
+function getVerticalDisplayMenuItem() {
+  if (!CacheMenuItems.verticalDisplay) {
+    const AppMenu = Menu.getApplicationMenu()
+    CacheMenuItems.verticalDisplay = getMenuItem.byId('vertical-display', AppMenu)
+  }
+  return CacheMenuItems.verticalDisplay
+}
+
+function getHorizontalDisplayMenuItem() {
+  if (!CacheMenuItems.horizontalDisplay) {
+    const AppMenu = Menu.getApplicationMenu()
+    CacheMenuItems.horizontalDisplay = getMenuItem.byId('horizontal-display', AppMenu)
+  }
+  return CacheMenuItems.horizontalDisplay
 }
 
 /**
@@ -215,7 +317,25 @@ function getNewPlayerMenuItem() {
  * @param {*} e The closing event
  */
 function closeSpectatorView(e) {
-  getSpectatorViewMenuItem().checked = false
+  getSpectatorViewOnMenuItem().checked = false
   wins.spectator.hide()
   e.preventDefault()
+}
+
+function setVerticalDisplay() {
+  changeDisplayType(Settings.VERTICAL_VIEW_TYPE)
+  getVerticalDisplayMenuItem().checked = true
+}
+
+function setHorizontalDisplay() {
+  changeDisplayType(Settings.HORIZONTAL_VIEW_TYPE)
+  getHorizontalDisplayMenuItem().checked = true
+}
+
+/**
+ * Tells the Spectator View how it should display its information
+ * @param {*} type The display type to set
+ */
+function changeDisplayType(type) {
+  wins.spectator.webContents.send(events.changeDisplayType, {displayType: type})
 }

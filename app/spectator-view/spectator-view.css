@@ -32,6 +32,9 @@ div.player-result {
   display: flex;
   align-items: center;
 }
+div.player-result .card-panel {
+  margin: 0;
+}
 main.horizontal div.player-result {
   flex-direction: row;
 }
@@ -50,47 +53,96 @@ span.score-display {
   font-size: 25px;
   color: white;
   position: absolute;
-  left: -30px;
-  top: -58px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
+main.horizontal span.score-display {
+  left: 15px;
+}
+main.vertical span.score-display {
+  bottom: 17px;
+}
+
 span.score-display:before {
   width: 0;
   height: 0;
   content: " ";
+  position: absolute;
+}
+main.horizontal span.score-display:before {
+  border-bottom: 8px solid transparent;
+  border-top: 8px solid transparent;
+  border-right: 10px solid #ff6e40;
+  right: 100%;
+}
+main.vertical span.score-display:before {
   border-right: 8px solid transparent;
   border-left: 8px solid transparent;
   border-top: 10px solid #ff6e40;
-  position: absolute;
   top: 100%;
-  /* right: 22px; */
 }
+
 span.score-display:after {
-  width: 19px;
-  height: 19px;
   content: " ";
   position: absolute;
-  top: 54px;
-  border-radius: 50px;
+  border-radius: 2px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   background-color: #ff3d00;
+}
+main.vertical span.score-display:after {
+  width: 20px;
+  height: 6px;
+  top: 54px;
   left: 20px;
 }
-div.player-result div.outer-score {
+main.horizontal span.score-display:after {
+  width: 6px;
+  height: 19px;
+  right: 72px;
+  top: 11px;
+}
+
+div.outer-score {
   background-color: #eceff1;
   flex: 1;
-  height: 10px;
   position: relative;
   display: flex;
-  align-items: center;
   border-radius: 50px;
-  margin: 0 50px;
 }
-div.player-result div.inner-score {
+main.horizontal div.outer-score{
+  align-items: center;
+  height: 10px;
+  margin: 0 92px 0 15px;
+}
+main.vertical div.outer-score {
+  justify-content: center;
+  align-items: flex-end;
+  width: 10px;
+  margin: 72px 0 15px 0;
+}
+
+div.inner-score {
   background-color: #ff6e40;
   position: absolute;
-  top: 0;
   bottom: 0;
   left: 0;
-  width: 0%;
   border-radius: 50px;
+}
+main.horizontal div.inner-score {
+  width: 0%;
+  top: 0;
+}
+main.vertical div.inner-score {
+  height: 0%;
+  right: 0;
+}
+
+div.score-wrapper {
+  display: flex;
+  position: relative;
+}
+main.vertical div.score-wrapper {
+  justify-content: center;
+}
+main.horizontal div.score-wrapper {
+  align-items: center;
 }

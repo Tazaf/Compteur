@@ -39,6 +39,7 @@ function createGameMasterView() {
  */
 function createSpectatorView(closeCallback) {
   wins.spectator = new BrowserWindow({
+    parent: wins.gmView,
     show: false,
     width: 800,
     height: 600,
@@ -46,7 +47,7 @@ function createSpectatorView(closeCallback) {
     backgroundColor: '#546e7a',
     title: "Vue spectateur"
   })
-  // wins.spectator.setMenu(null)
+  wins.spectator.setMenu(null)
   wins.spectator.webContents.openDevTools()
   wins.spectator.on('close', closeCallback)
   wins.spectator.loadURL(url.format({

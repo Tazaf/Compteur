@@ -8,7 +8,9 @@ const Settings = require(path.join(__dirname, '..', 'lib', 'settings-constants.j
 
 const $resultZone = $("#results")
 const $noGame = $("#no-game")
+const $main = $("main")
 
+let viewType = Settings.HORIZONTAL_VIEW_TYPE
 let $activePlayers = []
 let playerScores = []
 
@@ -24,7 +26,11 @@ ipc.on(events.updatePlayerScore, updatePlayerScore)
 
 ipc.on(events.addNewPlayer, addNewPlayer)
 
+ipc.on(events.changeDisplayType, (event, args) => setViewType(args.displayType))
+
 Components.getNoGameMessage().then(template => $noGame.append(template))
+
+$main.addClass(viewType)
 
 /* ----- FUNCTION DECLARATIONS ----- */
 
@@ -70,16 +76,20 @@ function updateAllScores() {
   const max = getMaxScore()
   $activePlayers.forEach($player => {
     const playerNb = $player.attr('id')
-    const $bar = $("div.inner-score", $player)
-    const $score = $("span.score-display", $player)
-    $score.text(playerScores[playerNb])
+    $("span.score-display", $player).text(playerScores[playerNb])
     const ratio = playerScores[playerNb] * 100 / max
-    console.log(playerNb, $bar, $score, playerScores[playerNb], ratio)
-    if (!isNaN(ratio)) {
-      $bar.animate({ width: `${ratio}%` }, 150)
-      $score.animate({ 'margin-left': `${ratio}%` }, 150)
-    }
+    !isNaN(ratio && animateScore($player, ratio))
   })
+}
+
+function animateScore($player, ratio) {
+  if (viewType === Settings.HORIZONTAL_VIEW_TYPE) {
+    $("div.inner-score", $player).animate({ width: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
+    $("div.score-wrapper", $player).animate({ left: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
+  } else if (viewType === Settings.VERTICAL_VIEW_TYPE) {
+    $("div.inner-score", $player).animate({ height: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
+    $("div.score-wrapper", $player).animate({ bottom: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
+  }
 }
 
 function updatePlayerScore(event, data) {
@@ -92,4 +102,10 @@ function updatePlayerScore(event, data) {
  */
 function getMaxScore() {
   return _.max(playerScores)
+}
+
+function setViewType(displayType) {
+  if (viewType === displayType) return
+  viewType = displayType
+  $main.attr('class', viewType)
 }

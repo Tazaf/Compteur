@@ -36,22 +36,12 @@ function getItemById(id, menu) {
  */
 function getItem(menu, matchFunction) {
   for (i in menu.items) {
-    if (menu.items[i].submenu && menu.items[i].submenu.items) {
-      var subItem = menu.items[i].submenu.items.find(matchFunction)
-      if (subItem) {
-        return subItem
-      } else {
-        var menuItem = menu.items.find(matchFunction)
-        if (menuItem) {
-          return menuItem
-        }
-      }
-    } else {
-      var menuItem = menu.items.find(matchFunction)
-      if (menuItem) {
-        return menuItem
-      }
+    if (menu.items[i].submenu) {
+      let menuItem = getItem(menu.items[i].submenu, matchFunction)
+      if (menuItem) return menuItem
     }
+    let menuItem = menu.items.find(matchFunction)
+    if (menuItem) return menuItem
   }
   return false
 }
