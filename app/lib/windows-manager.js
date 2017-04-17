@@ -44,7 +44,7 @@ function createSpectatorView(closeCallback) {
     width: 800,
     height: 600,
     skipTaskbar: true,
-    backgroundColor: '#cfd8dc',
+    backgroundColor: '#546e7a',
     title: "Vue spectateur"
   })
   // wins.spectator.setMenu(null)
