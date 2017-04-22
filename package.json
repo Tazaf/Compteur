@@ -9,7 +9,7 @@
     "reload": "live-reload . --port 35729"
   },
   "main": "app/main.js",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "license": "MIT",
   "description": "Compteur de points",
   "author": "Mathias (Tazaf) Oberson <obersonmathias@gmail.com>",
