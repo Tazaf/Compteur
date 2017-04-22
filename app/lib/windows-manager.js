@@ -2,7 +2,7 @@ const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const url = require('url')
-const MenuItems = require(path.join(__dirname, 'get-menu-item.js'))
+const AppMenuItems = require(path.join(__dirname, 'get-menu-item.js'))
 
 // Global references to the windows created
 const wins = {}
@@ -91,12 +91,12 @@ function toggleSpectatorView() {
   if (wins.spectator.isVisible()) {
     wins.spectator.isFullScreen() && spectatorViewFullScreen(false)
     wins.spectator.hide()
-    MenuItems.switchSpectatorView(false)
-    MenuItems.enableSpectatorViewItems(false)
+    AppMenuItems.switchSpectatorView(false)
+    AppMenuItems.enableSpectatorViewItems(false)
   } else {
     wins.spectator.show()
-    MenuItems.switchSpectatorView(true)
-    MenuItems.enableSpectatorViewItems(true)
+    AppMenuItems.switchSpectatorView(true)
+    AppMenuItems.enableSpectatorViewItems(true)
   }
 }
 
@@ -110,7 +110,7 @@ function toggleSpectatorView() {
  */
 function spectatorViewFullScreen(state) {
   wins.spectator.setFullScreen(state)
-  MenuItems.switchFullScreen(state)
+  AppMenuItems.switchFullScreen(state)
 }
 
 /**

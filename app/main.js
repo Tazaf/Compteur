@@ -2,14 +2,17 @@ const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const Menu = electron.Menu
+const MenuItem = electron.MenuItem
 const globalShortcut = electron.globalShortcut
 const ipc = electron.ipcMain
 const path = require('path')
 const url = require('url')
 const events = require(path.join(__dirname, 'lib', 'event-service.js'))
-const MenuItems = require(path.join(__dirname, 'lib', 'get-menu-item.js'))
+const AppMenuItems = require(path.join(__dirname, 'lib', 'get-menu-item.js'))
 const WindowsManager = require(path.join(__dirname, 'lib', 'windows-manager.js'))
 const Settings = require(path.join(__dirname, 'lib', 'settings-constants.js'))
+
+const DEBUG = false
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -58,9 +61,9 @@ ipc.on(events.nbPlayerSelected, (event, args) => {
   wins.spectator.webContents.send(events.nbPlayerSelected, args)
 })
 
-ipc.on(events.enableNewPlayerMenuItem, () => MenuItems.addNewPlayer().enabled = true)
+ipc.on(events.enableNewPlayerMenuItem, () => AppMenuItems.addNewPlayer().enabled = true)
 
-ipc.on(events.disableNewPlayerMenuItem, () => MenuItems.addNewPlayer().enabled = false)
+ipc.on(events.disableNewPlayerMenuItem, () => AppMenuItems.addNewPlayer().enabled = false)
 
 ipc.on(events.updatePlayerName, (event, args) => wins.spectator.webContents.send(events.updatePlayerName, args))
 ipc.on(events.updatePlayerScore, (event, args) => wins.spectator.webContents.send(events.updatePlayerScore, args))
@@ -176,18 +179,20 @@ function AppMenu() {
           ]
         }
       ]
-    }, {
-      role: 'quit',
-      label: 'Fermer'
-    }, {
+    }
+  ]
+  const AppMenu = Menu.buildFromTemplate(menuTemplate)
+  if (DEBUG) {
+    const debugMenuItem = new MenuItem({
       label: 'Debug',
       submenu: [
         { role: 'toggledevtools' },
         { role: 'reload' }
       ]
-    }
-  ]
-  const AppMenu = Menu.buildFromTemplate(menuTemplate)
+    })
+
+    AppMenu.append(debugMenuItem)
+  }
   return AppMenu
 }
 
@@ -202,14 +207,14 @@ function addNewPlayer() {
 function setVerticalDisplay() {
   if (wins.spectator.isVisible()) {
     changeDisplayType(Settings.VERTICAL_VIEW_TYPE)
-    MenuItems.verticalDisplay().checked = true
+    AppMenuItems.verticalDisplay().checked = true
   }
 }
 
 function setHorizontalDisplay() {
   if (wins.spectator.isVisible()) {
     changeDisplayType(Settings.HORIZONTAL_VIEW_TYPE)
-    MenuItems.horizontalDisplay().checked = true
+    AppMenuItems.horizontalDisplay().checked = true
   }
 }
 
