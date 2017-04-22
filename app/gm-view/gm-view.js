@@ -2,13 +2,9 @@ const fs = require('fs')
 const path = require('path')
 const url = require('url')
 const _ = require('lodash')
-const electron = require('electron')
-const ipc = electron.ipcRenderer
-const BrowserWindow = electron.BrowserWindow
-const Menu = electron.remote.Menu
+const ipc = require('electron').ipcRenderer
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
 const Components = require(path.join(__dirname, '..', 'components', 'components-module.js'))
-const getMenuItem = require(path.join(__dirname, '..', 'lib', 'get-menu-item.js'))
 const Settings = require(path.join(__dirname, '..', 'lib', 'settings-constants.js'))
 
 // Global variable to store the reference to the setTimeout that will trigger the click-hold event
