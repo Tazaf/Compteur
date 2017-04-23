@@ -1,12 +1,14 @@
 {
-  "name": "Compteur",
+  "name": "compteur",
   "dependencies": {
-    "electron": "^1.6.5",
     "lodash": "^4.17.4"
   },
   "scripts": {
-    "start": "electron .",
-    "reload": "live-reload . --port 35729"
+    "start": "env APP_ENV=dev electron .",
+    "prod": "electron .",
+    "reload": "live-reload . --port 35729",
+    "pack": "build --dir",
+    "dist": "build"
   },
   "main": "app/main.js",
   "version": "0.2.0",
@@ -14,6 +16,11 @@
   "description": "Compteur de points",
   "author": "Mathias (Tazaf) Oberson <obersonmathias@gmail.com>",
   "devDependencies": {
+    "electron": "^1.6.5",
     "live-reload": "^1.1.0"
+  },
+  "build": {
+    "appId": "compteur.app",
+    "productName": "Compteur"
   }
 }
