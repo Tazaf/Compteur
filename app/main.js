@@ -182,7 +182,7 @@ function AppMenu() {
     }
   ]
   const AppMenu = Menu.buildFromTemplate(menuTemplate)
-  if (DEBUG) {
+  if (process.env.APP_ENV === "dev") {
     const debugMenuItem = new MenuItem({
       label: 'Debug',
       submenu: [
