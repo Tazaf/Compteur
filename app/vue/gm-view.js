@@ -7,7 +7,7 @@ const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
 const components = require(path.join(__dirname, '..', 'components', 'components-module.js'))
 const settings = require(path.join(__dirname, '..', 'lib', 'settings-constants.js'))
 const Player = require(path.join(__dirname, '..', 'lib', 'player-class.js'))
-const scoreButton = require(path.join(__dirname, '..', 'components', 'score-button.js'))
+const scoreButton = require(path.join(__dirname, '..', 'vue-components', 'score-button.js'))
 
 // Cache for the jQuery objects representing each Player Cards
 let $activePlayers = []

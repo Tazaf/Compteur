@@ -35,19 +35,12 @@
               </div>
               <div class="modifiers">
                 <div class="plus-modifiers">
-                  <score-button v-model="player.score" :player="player" :modifier="1"></score-button>
-                  <score-button v-model="player.score" :modifier="2"></score-button>
-                  <!--<button @mousedown="initiateAutoIncrement(player, 1)" @mouseup="resolveModifier(player, 1)" class="btn plus one green accent-1 green-text text-darken-4 waves-effect" tabindex="-1">+1</button>-->
-                  <!--<button @mousedown="initiateAutoIncrement(player, 2)" @mouseup="resolveModifier(player, 2)" class="btn plus two green accent-2 green-text text-darken-4 waves-effect" tabindex="-1">+2</button>-->
+                  <score-button :player="player" :modifier="1" @score="updateScore(player, $event)" class="green accent-1 green-text text-darken-4"></score-button>
+                  <score-button :player="player" :modifier="2" @score="updateScore(player, $event)" class="green accent-2 green-text text-darken-4"></score-button>
                 </div>
                 <div class="minus-modifiers">
-                  <score-button v-model="player.score" :modifier="-1"></score-button>
-                  <score-button v-model="player.score" :modifier="-2"></score-button>
-
-                  <!--<button @mousedown="initiateAutoIncrement(player, -1)" @mouseup="resolveModifier(player, -1)" class="btn minus one red accent-1 waves-effect"
-                    tabindex="-1">-1</button>
-                  <button @mousedown="initiateAutoIncrement(player, -2)" @mouseup="resolveModifier(player, -2)" class="btn minus two red accent-2 waves-effect"
-                    tabindex="-1">-2</button>-->
+                  <score-button :player="player" :modifier="-1" @score="updateScore(player, $event)" class="red accent-1"></score-button>
+                  <score-button :player="player" :modifier="-2" @score="updateScore(player, $event)" class="red accent-2"></score-button>
                 </div>
               </div>
             </div>

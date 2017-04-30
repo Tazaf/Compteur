@@ -8,11 +8,11 @@ let holdPending
 let holdActive
 
 const component = {
-  props: ['player', 'modifier', 'value'],
+  props: ['player', 'modifier'],
   computed: {
     label: function () {
       return this.modifier > 0 ? `+${this.modifier}` : this.modifier
-    }
+    },
   },
   methods: {
     /**
@@ -30,11 +30,14 @@ const component = {
      * In the second case, the autoIncrement function is called.
      */
     resolveModifier: function (player, modifier) {
-      if (holdPending) {
+      if (holdActive) {
+        clearInterval(holdActive)
+        holdActive = undefined
+      } else if (holdPending) {
         clearTimeout(holdPending)
+        holdPending = undefined
         this.changeScore(player, modifier)
       }
-      !!holdActive && clearInterval(holdActive)
     },
     /**
      * Creates an automatic incrementation of a player's score.
@@ -45,7 +48,7 @@ const component = {
      * @param {Number} modifier A number representing the modifier to apply to the score
      */
     autoIncrement: function (player, modifier) {
-      // holdActive = setInterval(() => this.changeScore(player, modifier), settings.AUTO_INCREMENT_DELAY)
+      holdActive = setInterval(() => this.changeScore(player, modifier), settings.AUTO_INCREMENT_DELAY)
     },
     /**
      * Changes the score on a player's card, applying it the given modifier.
@@ -55,17 +58,16 @@ const component = {
      * @param {*} modifier The modifier to apply to the new score
      */
     changeScore: function (player, modifier) {
-      console.log('changeScore', player, modifier)
-      let score = player
+      let score = player.score
       score += modifier
 
       score < 0 && (score = 0)
       score > 999 && (score = 999)
 
-      this.$emit('input', score)
+      this.$emit('score', score)
     }
   },
-  template: '<button @mousedown="initiateAutoIncrement(value, modifier)" @mouseup="resolveModifier(value, modifier)" class="btn green accent-1 green-text text-darken-4 waves-effect" tabindex="-1">{{ label }}</button>'
+  template: '<button @mousedown="initiateAutoIncrement(player, modifier)" @mouseup="resolveModifier(player, modifier)" class="btn waves-effect" tabindex="-1">{{ label }}</button>'
 }
 
 module.exports = component
