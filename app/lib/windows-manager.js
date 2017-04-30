@@ -4,6 +4,8 @@ const path = require('path')
 const url = require('url')
 const AppMenuItems = require(path.join(__dirname, 'get-menu-item.js'))
 
+const DEBUG = (process.env.APP_ENV === "dev")
+
 // Global references to the windows created
 const wins = {}
 
@@ -27,12 +29,12 @@ function createGameMasterView() {
     height: 600,
     backgroundColor: '#cfd8dc'
   })
-  // wins.gmView.webContents.openDevTools()
+  DEBUG && wins.gmView.webContents.openDevTools()
   wins.gmView.on('closed', () => {
     wins.gmView = null
   })
   wins.gmView.loadURL(url.format({
-    pathname: path.join(__dirname, '..', 'gm-view', 'gm-view.html'),
+    pathname: path.join(__dirname, '..', 'vue', 'gm-view.html'),
     protocol: 'file:',
     slashes: true
   }))

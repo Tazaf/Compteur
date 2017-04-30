@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Compteur</title>
+  <link rel="stylesheet" href="../assets/materialize/css/materialize.min.css">
+  <link rel="stylesheet" href="../assets/material-icons-font/material-icons.css">
+  <link rel="stylesheet" href="./gm-view.css">
+</head>
+
+<body class="blue-grey lighten-4">
+  <main>
+    <div id="no-game" class="blue-grey-text" v-if="visible">
+      <div>
+        <i class="material-icons deep-orange-text text-accent-2">info_outline</i>
+        <h5>Aucune partie en cours...</h5>
+        <p><a class="deep-orange accent-2 btn waves-effect" @click="newGame">Nouvelle partie</a></p>
+        <p><kbd>[Ctrl + N]</kbd></p>
+      </div>
+    </div>
+    <div id="game" class="row" v-if="visible">
+      <div id="players">
+        <template v-for="player of players">
+          <div class="col m12 l6 player-card" :id="player.id">
+            <div class="card-panel blue-grey-text text-darken-3 player">
+              <div class="player-name">
+                <div class="input-field">
+                  <input v-model="player.name" v-first-focus="player.id" type="text" maxlength="25">
+                  <label>Joueur {{ player.id }}</label>
+                </div>
+              </div>
+              <div class="score">
+                <h1 class="value">{{ player.score }}</h1>
+              </div>
+              <div class="modifiers">
+                <div class="plus-modifiers">
+                  <score-button v-model="player.score" :player="player" :modifier="1"></score-button>
+                  <score-button v-model="player.score" :modifier="2"></score-button>
+                  <!--<button @mousedown="initiateAutoIncrement(player, 1)" @mouseup="resolveModifier(player, 1)" class="btn plus one green accent-1 green-text text-darken-4 waves-effect" tabindex="-1">+1</button>-->
+                  <!--<button @mousedown="initiateAutoIncrement(player, 2)" @mouseup="resolveModifier(player, 2)" class="btn plus two green accent-2 green-text text-darken-4 waves-effect" tabindex="-1">+2</button>-->
+                </div>
+                <div class="minus-modifiers">
+                  <score-button v-model="player.score" :modifier="-1"></score-button>
+                  <score-button v-model="player.score" :modifier="-2"></score-button>
+
+                  <!--<button @mousedown="initiateAutoIncrement(player, -1)" @mouseup="resolveModifier(player, -1)" class="btn minus one red accent-1 waves-effect"
+                    tabindex="-1">-1</button>
+                  <button @mousedown="initiateAutoIncrement(player, -2)" @mouseup="resolveModifier(player, -2)" class="btn minus two red accent-2 waves-effect"
+                    tabindex="-1">-2</button>-->
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+      <div id="add-new-player" v-if="!maxPlayers">
+        <div class="col m12 l6">
+          <div id="new-player-button" class="">
+            <i class="material-icons">person_add</i>
+            <h5>Ajouter un joueur</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- script inclusions -->
+  <!-- Insert this line above script imports  -->
+  <script>
+    if (typeof module === 'object') { window.module = module; module = undefined; }
+  </script>
+  <!-- normal script imports etc  -->
+  <script src="../assets/vue-js/vue.js"></script>
+  <script src="../assets/jquery/jquery.min.js"></script>
+  <script src="../assets/materialize/js/materialize.min.js"></script>
+  <!-- Insert this line after script imports -->
+  <script>
+    if (window.module) module = window.module;
+  </script>
+  <script>
+    require('./gm-view.js')
+  </script>
+  <script src="http://localhost:35729/livereload.js"></script>
+</body>
+
+</html>

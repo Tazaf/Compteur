@@ -12,7 +12,7 @@ const AppMenuItems = require(path.join(__dirname, 'lib', 'get-menu-item.js'))
 const WindowsManager = require(path.join(__dirname, 'lib', 'windows-manager.js'))
 const Settings = require(path.join(__dirname, 'lib', 'settings-constants.js'))
 
-const DEBUG = false
+const DEBUG = (process.env.APP_ENV === "dev")
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -182,7 +182,7 @@ function AppMenu() {
     }
   ]
   const AppMenu = Menu.buildFromTemplate(menuTemplate)
-  if (process.env.APP_ENV === "dev") {
+  if (DEBUG) {
     const debugMenuItem = new MenuItem({
       label: 'Debug',
       submenu: [
