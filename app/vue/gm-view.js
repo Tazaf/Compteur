@@ -15,7 +15,6 @@ const Logger = require(path.join(__dirname, '..', 'lib', 'logger.js'))
 
 /* ----- VUE COMPONENTS ----- */
 
-const scoreButton = require(path.join(__dirname, '..', 'vue-components', 'score-button.js'))
 const noGame = require(path.join(__dirname, '..', 'vue-components', 'no-game.js'))
 const newPlayerBtn = require(path.join(__dirname, '..', 'vue-components', 'new-player-button.js'))
 const playerCard = require(path.join(__dirname, '..', 'vue-components', 'player-card.js'))
@@ -28,9 +27,6 @@ Vue.directive('first-focus', {
   inserted: (el, binding) => binding.value === 1 && el.focus()
 })
 
-// Cache for the jQuery objects representing each Player Cards
-let $activePlayers = []
-
 /* ----- VUE INITIALIZATION ----- */
 
 const app = new Vue({
@@ -40,16 +36,11 @@ const app = new Vue({
     players: []
   },
   computed: {
-    hasMaxPlayers: hasMaxPlayersFn
+    hasMaxPlayers: () => this.players.length >= settings.NB_PLAYERS_MAX
   },
   methods: {
-    updatePlayerName: _.debounce(updatePlayerNameFn, 150),
-    updateScore: updateScore,
     createNewGame: createNewGameFn,
     createNewPlayer: createNewPlayerFn
-  },
-  components: {
-    'score-button': scoreButton
   }
 })
 
@@ -61,34 +52,6 @@ ipc.on(events.addNewPlayer, app.createNewPlayer)
 
 
 /* ----- FUNCTION DECLARATIONS ----- */
-
-/**
- * Updates the score of the player and send the data to the Spectator View
- */
-function updateScore(player, score) {
-  player.score = score
-  ipc.send(events.updatePlayerScore, {
-    playerNb: player.id,
-    score: player.score,
-  })
-}
-
-/**
- * Returns true if the maximum number of player has been reached in the current game.
- */
-function hasMaxPlayersFn() {
-  return this.players.length >= settings.NB_PLAYERS_MAX
-}
-
-function updatePlayerNameFn() {
-  const value = $(this).val()
-  const playerNb = $(this).attr('id')
-  ipc.send(events.updatePlayerName, {
-    playerNb,
-    value
-  })
-  toggleModifierButtons(value, $(this))
-}
 
 /**
  * Hide or show the modifier buttons depending on the value of their related input.
@@ -128,7 +91,5 @@ function createNewPlayerFn() {
   const newPlayerNb = this.players.length + 1
   if (newPlayerNb === 1 || newPlayerNb > settings.NB_PLAYERS_MAX) return
   this.players.push(new Player(newPlayerNb))
-  if (newPlayerNb >= settings.NB_PLAYERS_MAX) {
-    ipc.send(events.disableNewPlayerMenuItem)
-  }
+  if (newPlayerNb >= settings.NB_PLAYERS_MAX) ipc.send(events.disableNewPlayerMenuItem)
 }

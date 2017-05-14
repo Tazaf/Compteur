@@ -2,7 +2,6 @@ const path = require('path')
 const electron = require('electron')
 const Menu = electron.Menu
 const StrConv = require(path.join(__dirname, 'string-convert.js'))
-const Logger = require(path.join(__dirname, 'logger.js'))
 
 const CacheMenuItems = {}
 let AppMenu
@@ -99,7 +98,6 @@ function getItem(menu, matchFunction) {
  * @param {*} itemName The name of the item in the cache object. Should be in camelCase format.
  */
 function getMenuItemFromCache(itemName) {
-  Logger.log('GetMenuItem:getMenuItemFromCache', itemName)
   if (!CacheMenuItems.hasOwnProperty(itemName)) {
     CacheMenuItems[itemName] = getItemByIdFn(StrConv.camelCaseToDash(itemName), getAppMenu())
   }

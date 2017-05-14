@@ -8,7 +8,7 @@ let holdPending
 // Global variable to store the reference to the setInterval responsible for the autoincrementation of the score
 let holdActive
 
-const component = {
+const component = Vue.component('score-button', {
   props: ['player', 'modifier'],
   computed: {
     label: labelFn
@@ -26,7 +26,7 @@ const component = {
     changeScore: changeScoreFn
   },
   template: '<button @mousedown="initiateAutoIncrement(player, modifier)" @mouseup="resolveModifier(player, modifier)" class="btn waves-effect" tabindex="-1">{{ label }}</button>'
-}
+})
 
 module.exports = component
 
