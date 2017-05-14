@@ -2,20 +2,21 @@ const path = require('path')
 const electron = require('electron')
 const Menu = electron.Menu
 const StrConv = require(path.join(__dirname, 'string-convert.js'))
+const Logger = require(path.join(__dirname, 'logger.js'))
 
 const CacheMenuItems = {}
 let AppMenu
 
-exports.byId = getItemById
-exports.byLabel = getItemByLabel
-exports.spectatorViewOn = () => getMenuItemFromCache('spectatorViewOn')
-exports.spectatorViewOff = () => getMenuItemFromCache('spectatorViewOff')
-exports.verticalDisplay = () => getMenuItemFromCache('verticalDisplay')
-exports.horizontalDisplay = () => getMenuItemFromCache('horizontalDisplay')
-exports.addNewPlayer = () => getMenuItemFromCache('addNewPlayer')
-exports.switchFullScreen = switchFullScreen
-exports.switchSpectatorView = switchSpectatorView
-exports.enableSpectatorViewItems = enableSpectatorViewItems
+exports.byId = getItemByIdFn
+exports.byLabel = getItemByLabelFn
+exports.switchFullScreen = switchFullScreenFn
+exports.switchSpectatorView = switchSpectatorViewFn
+exports.enableSpectatorViewItems = enableSpectatorViewItemsFn
+Object.defineProperty(exports, 'spectatorViewOn', { get: () => getMenuItemFromCache('spectatorViewOn') });
+Object.defineProperty(exports, 'spectatorViewOff', { get: () => getMenuItemFromCache('spectatorViewOff') });
+Object.defineProperty(exports, 'verticalDisplay', { get: () => getMenuItemFromCache('verticalDisplay') });
+Object.defineProperty(exports, 'horizontalDisplay', { get: () => getMenuItemFromCache('horizontalDisplay') });
+Object.defineProperty(exports, 'addNewPlayer', { get: () => getMenuItemFromCache('addNewPlayer') });
 
 /* ----- EXPORTED FUNCTIONS ----- */
 
@@ -24,7 +25,7 @@ exports.enableSpectatorViewItems = enableSpectatorViewItems
  * @param {*} id The label of the Menu Item to retrieve
  * @param {*} menu The Menu from which the Menu Item is to be retrieved
  */
-function getItemById(id, menu) {
+function getItemByIdFn(id, menu) {
   return getItem(menu, (item) => item.id === id)
 }
 
@@ -33,7 +34,7 @@ function getItemById(id, menu) {
  * @param {*} label The label of the Menu Item to retrieve
  * @param {*} menu The Menu from which the Menu Item is to be retrieved
  */
-function getItemByLabel(label, menu) {
+function getItemByLabelFn(label, menu) {
   return getItem(menu, (item) => item.label.toString().toLowerCase() === label.toString().toLowerCase())
 }
 
@@ -42,7 +43,7 @@ function getItemByLabel(label, menu) {
  * Passing true means that the FullScreen is on, while passing false means it's off.
  * @param {Boolean} state The state of the Spectator View Full Screen 
  */
-function switchFullScreen(state) {
+function switchFullScreenFn(state) {
   getMenuItemFromCache('fullScreenOn').visible = !state
   getMenuItemFromCache('fullScreenOff').visible = !!state
 }
@@ -52,7 +53,7 @@ function switchFullScreen(state) {
  * Passing true means that the Spectator View is visible, while passing false means it's hidden.
  * @param {Boolean} state The state of the Spectator View
  */
-function switchSpectatorView(state) {
+function switchSpectatorViewFn(state) {
   getMenuItemFromCache('spectatorViewOn').visible = !state
   getMenuItemFromCache('spectatorViewOff').visible = !!state
 }
@@ -65,7 +66,7 @@ function switchSpectatorView(state) {
  * * Player Sort
  * @param {Boolean} state The state of the Spectator View Menu Items 
  */
-function enableSpectatorViewItems(state) {
+function enableSpectatorViewItemsFn(state) {
   getMenuItemFromCache('display').enabled = state
   getMenuItemFromCache('fullScreenOn').enabled = state
   getMenuItemFromCache('fullScreenOff').enabled = state
@@ -98,8 +99,9 @@ function getItem(menu, matchFunction) {
  * @param {*} itemName The name of the item in the cache object. Should be in camelCase format.
  */
 function getMenuItemFromCache(itemName) {
+  Logger.log('GetMenuItem:getMenuItemFromCache', itemName)
   if (!CacheMenuItems.hasOwnProperty(itemName)) {
-    CacheMenuItems[itemName] = getItemById(StrConv.camelCaseToDash(itemName), getAppMenu())
+    CacheMenuItems[itemName] = getItemByIdFn(StrConv.camelCaseToDash(itemName), getAppMenu())
   }
   return CacheMenuItems[itemName]
 }

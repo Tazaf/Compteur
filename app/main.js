@@ -11,6 +11,7 @@ const events = require(path.join(__dirname, 'lib', 'event-service.js'))
 const AppMenuItems = require(path.join(__dirname, 'lib', 'get-menu-item.js'))
 const WindowsManager = require(path.join(__dirname, 'lib', 'windows-manager.js'))
 const Settings = require(path.join(__dirname, 'lib', 'settings-constants.js'))
+const Logger = require(path.join(__dirname, 'lib', 'logger.js'))
 
 const DEBUG = (process.env.APP_ENV === "dev")
 
@@ -61,9 +62,9 @@ ipc.on(events.nbPlayerSelected, (event, args) => {
   wins.spectator.webContents.send(events.nbPlayerSelected, args)
 })
 
-ipc.on(events.enableNewPlayerMenuItem, () => AppMenuItems.addNewPlayer().enabled = true)
+ipc.on(events.enableNewPlayerMenuItem, () => AppMenuItems.addNewPlayer.enabled = true)
 
-ipc.on(events.disableNewPlayerMenuItem, () => AppMenuItems.addNewPlayer().enabled = false)
+ipc.on(events.disableNewPlayerMenuItem, () => AppMenuItems.addNewPlayer.enabled = false)
 
 ipc.on(events.updatePlayerName, (event, args) => wins.spectator.webContents.send(events.updatePlayerName, args))
 ipc.on(events.updatePlayerScore, (event, args) => wins.spectator.webContents.send(events.updatePlayerScore, args))
@@ -204,17 +205,23 @@ function addNewPlayer() {
   wins.spectator.webContents.send(events.addNewPlayer)
 }
 
+/**
+ * Switch the Spectator View to a vertical display, if the window is visible
+ */
 function setVerticalDisplay() {
   if (wins.spectator.isVisible()) {
     changeDisplayType(Settings.VERTICAL_VIEW_TYPE)
-    AppMenuItems.verticalDisplay().checked = true
+    AppMenuItems.verticalDisplay.checked = true
   }
 }
 
+/**
+ * Switch the Spectator View to an horizontal display, if the window is visible
+ */
 function setHorizontalDisplay() {
   if (wins.spectator.isVisible()) {
     changeDisplayType(Settings.HORIZONTAL_VIEW_TYPE)
-    AppMenuItems.horizontalDisplay().checked = true
+    AppMenuItems.horizontalDisplay.checked = true
   }
 }
 
