@@ -141,7 +141,10 @@ function okActionFn() {
   ipc.send(events.nbPlayerSelected, this.private.nbPlayers)
 }
 
-
+/**
+ * Apply CSS classes to prev and next number of player, depending on the one currently overed
+ * @param {Number} value The number of player over whom the mouse is
+ */
 function enterFn(value) {
   this.private.prev = _.find(this.choices, { value: value - 1 })
   this.private.next = _.find(this.choices, { value: value + 1 })
@@ -149,6 +152,10 @@ function enterFn(value) {
   this.private.next && (this.private.next.surrounder = true)
 }
 
+/**
+ * Removes CSS classes to prev and next number of players, depending on the one currently exited
+ * @param {Number} value The number of player that the mouse exited
+ */
 function exitFn(value) {
   this.private.prev && (this.private.prev.surrounder = false)
   this.private.next && (this.private.next.surrounder = false)
