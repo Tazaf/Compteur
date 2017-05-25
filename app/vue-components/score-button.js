@@ -3,11 +3,6 @@ const settings = require(path.join(__dirname, '..', 'lib', 'settings-constants.j
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
 const Logger = require(path.join(__dirname, '..', 'lib', 'logger.js'))
 
-// Global variable to store the reference to the setTimeout that will trigger the click-hold event
-let holdPending
-// Global variable to store the reference to the setInterval responsible for the autoincrementation of the score
-let holdActive
-
 const component = Vue.component('score-button', {
   props: ['player', 'modifier'],
   computed: {

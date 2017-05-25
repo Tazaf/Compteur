@@ -3,32 +3,20 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Compteur</title>
+  <title>Increment</title>
   <link rel="stylesheet" href="../assets/materialize/css/materialize.min.css">
   <link rel="stylesheet" href="../assets/material-icons-font/material-icons.css">
   <link rel="stylesheet" href="./gm-view.css">
 </head>
 
 <body class="blue-grey lighten-4">
-  <main>
-    <div id="no-game" class="blue-grey-text">
-      <div>
-        <i class="material-icons deep-orange-text text-accent-2">info_outline</i>
-        <h5>Aucune partie en cours...</h5>
-        <p><a id="new-counter" class="deep-orange accent-2 btn waves-effect">Nouvelle partie</a></p>
-        <p><kbd>[Ctrl + N]</kbd></p>
+  <main id="app">
+    <no-game id="no-game" v-if="state === 'no-game'"></no-game>
+    <div id="game" class="row" v-if="state === 'game'">
+      <div id="players">
+        <player-card v-for="player of players" :player="player" :key="player.id"></player-card>
       </div>
-    </div>
-    <div id="game" class="hide row">
-      <div id="players"></div>
-      <div id="add-new-player">
-        <div class="col m12 l6">
-          <div id="new-player-button" class="">
-            <i class="material-icons">person_add</i>
-            <h5>Ajouter un joueur</h5>
-          </div>
-        </div>
-      </div>
+      <new-player-button v-if="!hasMaxPlayers"></new-player-button>
     </div>
   </main>
   <!-- script inclusions -->
@@ -37,6 +25,7 @@
     if (typeof module === 'object') { window.module = module; module = undefined; }
   </script>
   <!-- normal script imports etc  -->
+  <script src="../assets/vue-js/vue.js"></script>
   <script src="../assets/jquery/jquery.min.js"></script>
   <script src="../assets/materialize/js/materialize.min.js"></script>
   <!-- Insert this line after script imports -->

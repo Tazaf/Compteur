@@ -34,7 +34,7 @@ function createGameMasterView() {
     wins.gmView = null
   })
   wins.gmView.loadURL(url.format({
-    pathname: path.join(__dirname, '..', 'vue', 'gm-view.html'),
+    pathname: path.join(__dirname, '..', 'gm-view', 'gm-view.html'),
     protocol: 'file:',
     slashes: true
   }))

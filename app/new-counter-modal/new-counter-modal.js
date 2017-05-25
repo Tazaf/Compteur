@@ -1,14 +1,9 @@
-const ipc = require('electron').ipcRenderer
 const path = require('path')
+const _ = require('lodash')
+const ipc = require('electron').ipcRenderer
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
-
-// A jQuery object representing the list of possible numner of players
-const $choiceList = $('#choice-list')
-// A jQuery object representing the OK button
-const $okBtn = $('#ok')
-// A jQuery object representing the cancel button
-const $cancelBtn = $("#cancel")
-
+const Logger = require(path.join(__dirname, '..', 'lib', 'logger.js'))
+const Settings = require(path.join(__dirname, '..', 'lib', 'settings-constants.js'))
 // Key constant used to detect key strokes
 const KEYS = {
   PRESS: {
@@ -21,52 +16,64 @@ const KEYS = {
   }
 }
 
-// The number of players to create for the new game
-let nbPlayers
-// A cache that stores a reference to the setTimeout that will trigger the end of keyboard selection
-let keyBuffer
-// The final value selected with the keyboard
-let keyBufferValue = ''
+const mewCounter = new Vue({
+  el: '#new-counter',
+  data: {
+    choices: [
+      { value: 1, selected: false, surrounder: false },
+      { value: 2, selected: false, surrounder: false },
+      { value: 3, selected: false, surrounder: false },
+      { value: 4, selected: false, surrounder: false },
+      { value: 5, selected: false, surrounder: false },
+      { value: 6, selected: false, surrounder: false },
+      { value: 7, selected: false, surrounder: false },
+      { value: 8, selected: false, surrounder: false },
+      { value: 9, selected: false, surrounder: false },
+      { value: 10, selected: false, surrounder: false },
+    ],
+    okBtnDisabled: true
+  },
+  methods: {
+    startKeyBuffer: startKeyBufferFn,
+    detectActionKey: detectActionKeyFn,
+    selectNbPlayerWithKeyboard: selectNbPlayerWithKeyboardFn,
+    cancelAction: cancelActionFn,
+    okAction: okActionFn,
+    selectNbPlayer: selectNbPlayerFn,
+    enter: enterFn,
+    exit: exitFn
+  },
+  created() {
+    this.private = {
+      nbPlayers: null,
+      keyBuffer: null,
+      keyBufferValue: '',
+      prev: null,
+      next: null
+    }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      document.addEventListener('keypress', this.startKeyBuffer)
+      document.addEventListener('keydown', this.detectActionKey)
+    })
+  }
+})
 
-/* ----- TEMPLATE EVENTS ----- */
-
-$(document).keypress(startKeyBuffer)
-$(document).keydown(detectActionKey)
-
-$cancelBtn.click(() => ipc.send(events.nbPlayerModalClose))
-
-$okBtn.click(() => ipc.send(events.nbPlayerSelected, nbPlayers))
-
-$('li', $choiceList).click(selectChoice)
-
-$("li", $choiceList).hover(addSurrounders, removeSurrounders)
-
-/* ----- FUNCTIONS DECLARATIONS ----- */
+/* ----- FUNCTION DECLARATIONS ----- */
 
 /**
- * Activate the selected number of player.
- * Doing so, it also enables the OK button
+ * Starts listening to keystrokes and catching them if they match the excpected key.
+ * This means that the buffer is only started if the user press numbered keys.
+ * @param {*} event The event fired
  */
-function selectChoice() {
-  nbPlayers = $(this).text()
-  $('li.active', $choiceList).removeClass('active')
-  $(this).addClass('active')
-  $okBtn.hasClass('disabled') && $okBtn.removeClass('disabled')
-}
-
-/**
- * Removes the zoom effect on the number surrounding the number previously hovered
- */
-function removeSurrounders() {
-  $("li.surrounder", $choiceList).removeClass('surrounder')
-}
-
-/**
- * Adds the zoom effect on the number surrouding the number currently hovered
- */
-function addSurrounders() {
-  $(this).prev().addClass('surrounder')
-  $(this).next().addClass('surrounder')
+function startKeyBufferFn(event) {
+  // Logger.log(event.which, event.keyCode)
+  if (event.which >= KEYS.PRESS.NUM_1 && event.which <= KEYS.PRESS.NUM_9) {
+    this.private.keyBufferValue += String.fromCharCode(event.keyCode)
+    this.private.keyBuffer && clearTimeout(this.private.keyBuffer)
+    this.private.keyBuffer = setTimeout(this.selectNbPlayerWithKeyboard, 150)
+  }
 }
 
 /**
@@ -74,35 +81,75 @@ function addSurrounders() {
  * The activation is done only if the typed value is valid
  * i.e. is a number and is in the correct range
  */
-function selectNbPlayerWithKeyboard() {
-  const value = parseInt(keyBufferValue)
-  console.log(value)
-  if (!isNaN(value) && value > 0 && value <= 10) {
-    $("li.active", $choiceList).removeClass('active')
-    $(`#${value}`, $choiceList).click()
+function selectNbPlayerWithKeyboardFn() {
+  const value = parseInt(this.private.keyBufferValue)
+  Logger.log(value)
+  if (!isNaN(value) && value > 0 && value <= Settings.NB_PLAYERS_MAX) {
+    this.selectNbPlayer(value)
   }
-  keyBufferValue = ''
+  this.private.keyBufferValue = ''
 }
 
-function detectActionKey(event) {
-  console.log(event.which, event.keyCode)
-  if (event.which === KEYS.DOWN.ESC) {
-    $cancelBtn.click()
-  } else if (event.which === KEYS.DOWN.ENTER) {
-    !$okBtn.hasClass('disabled') && $okBtn.click()
+/**
+ * Change the state of the modal so that the selected number of player is highlighted
+ * @param {Number} value The selected number of player for the game
+ */
+function selectNbPlayerFn(value) {
+  this.private.nbPlayers = value
+  var activeChoice = _.find(this.choices, { selected: true })
+  var selectedChoice = _.find(this.choices, { value: value })
+  if (selectedChoice) {
+    if (activeChoice) {
+      if (activeChoice.selected === selectedChoice.selected) {
+        selectedChoice.selected = false
+        this.okBtnDisabled = true
+      } else {
+        selectedChoice.selected = true
+        activeChoice.selected = false
+      }
+    } else {
+      selectedChoice.selected = true
+      this.okBtnDisabled = false
+    }
   }
 }
 
 /**
- * Starts listening to keystrokes and catching them if they match the excpected key.
- * This means that the buffer is only started if the user press numbered keys.
+ * Detects ESC or ENTER strokes and act accordingly
  * @param {*} event The event fired
  */
-function startKeyBuffer(event) {
-  console.log(event.which, event.keyCode)
-  if (event.which >= KEYS.PRESS.NUM_1 && event.which <= KEYS.PRESS.NUM_9) {
-    keyBufferValue += String.fromCharCode(event.keyCode)
-    keyBuffer && clearTimeout(keyBuffer)
-    keyBuffer = setTimeout(selectNbPlayerWithKeyboard, 200)
+function detectActionKeyFn(event) {
+  Logger.log(event.which, event.keyCode)
+  if (event.which === KEYS.DOWN.ESC) {
+    this.cancelAction()
+  } else if (event.which === KEYS.DOWN.ENTER) {
+    !this.okBtnDisabled && this.okAction()
   }
+}
+
+/**
+ * Triggers to dismiss the modal
+ */
+function cancelActionFn() {
+  ipc.send(events.nbPlayerModalClose)
+}
+
+/**
+ * Triggers when the number of players have been selected
+ */
+function okActionFn() {
+  ipc.send(events.nbPlayerSelected, this.private.nbPlayers)
+}
+
+
+function enterFn(value) {
+  this.private.prev = _.find(this.choices, { value: value - 1 })
+  this.private.next = _.find(this.choices, { value: value + 1 })
+  this.private.prev && (this.private.prev.surrounder = true)
+  this.private.next && (this.private.next.surrounder = true)
+}
+
+function exitFn(value) {
+  this.private.prev && (this.private.prev.surrounder = false)
+  this.private.next && (this.private.next.surrounder = false)
 }

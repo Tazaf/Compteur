@@ -1,5 +1,5 @@
 {
-  "name": "compteur",
+  "name": "increment",
   "dependencies": {
     "lodash": "^4.17.4"
   },
@@ -20,7 +20,7 @@
     "live-reload": "^1.1.0"
   },
   "build": {
-    "appId": "compteur.app",
-    "productName": "Compteur"
+    "appId": "increment.app",
+    "productName": "Increment"
   }
 }
