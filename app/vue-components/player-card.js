@@ -3,11 +3,12 @@ const _ = require('lodash')
 const ipc = require('electron').ipcRenderer
 const scoreButton = require(path.join(__dirname, '..', 'vue-components', 'score-button.js'))
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
+const Logger = require(path.join(__dirname, '..', 'lib', 'logger.js'))
 
 const component = Vue.component('player-card', {
   props: ['player'],
   methods: {
-    updatePlayerName: _.debounce(updatePlayerNameFn, 150),
+    sendPlayerName: _.debounce(sendPlayerNameFn, 150),
     updateScore: updateScoreFn
   },
   template: `
@@ -15,7 +16,7 @@ const component = Vue.component('player-card', {
       <div class="card-panel blue-grey-text text-darken-3 player">
         <div class="player-name">
           <div class="input-field">
-            <input v-model="player.name" v-first-focus="player.id" type="text" maxlength="25">
+            <input v-model="player.name" v-player-focus="player.focus" @keyup="sendPlayerName" type="text" maxlength="25">
             <label>Joueur {{ player.id }}</label>
           </div>
         </div>
@@ -52,12 +53,9 @@ function updateScoreFn(player, score) {
 }
 
 // TODO : send an event when the name of the player changes
-function updatePlayerNameFn() {
-  const value = $(this).val()
-  const playerNb = $(this).attr('id')
+function sendPlayerNameFn() {
   ipc.send(events.updatePlayerName, {
-    playerNb,
-    value
+    playerNb: this.player.id,
+    value: this.player.name
   })
-  toggleModifierButtons(value, $(this))
 }

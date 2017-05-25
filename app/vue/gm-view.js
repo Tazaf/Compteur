@@ -23,8 +23,8 @@ Vue.directive('focus', {
   inserted: el => el.focus()
 })
 
-Vue.directive('first-focus', {
-  inserted: (el, binding) => binding.value === 1 && el.focus()
+Vue.directive('player-focus', {
+  inserted: (el, binding) => binding.value === true && el.focus()
 })
 
 /* ----- VUE INITIALIZATION ----- */
@@ -36,7 +36,7 @@ const app = new Vue({
     players: []
   },
   computed: {
-    hasMaxPlayers: () => this.players.length >= settings.NB_PLAYERS_MAX
+    hasMaxPlayers: hasMaxPlayersFn
   },
   methods: {
     createNewGame: createNewGameFn,
@@ -52,6 +52,13 @@ ipc.on(events.addNewPlayer, app.createNewPlayer)
 
 
 /* ----- FUNCTION DECLARATIONS ----- */
+
+/**
+ * Indicates wether or not the maximum number of players has been reached.
+ */
+function hasMaxPlayersFn() {
+  return this.players.length >= settings.NB_PLAYERS_MAX
+}
 
 /**
  * Hide or show the modifier buttons depending on the value of their related input.
@@ -74,22 +81,24 @@ function createNewGameFn(event, nbPlayer) {
   this.players = []
   nbPlayer = parseInt(nbPlayer)
   for (let i = 1; i <= nbPlayer; i++) {
-    this.players.push(new Player(i))
+    var values = { id: i }
+    if (i === 1) values.focus = true
+    this.players.push(new Player(values))
   }
-  Logger.log(events)
   ipc.send(events.enableNewPlayerMenuItem)
-  console.log(app)
 }
 
 /**
- * If possible, creates a new player in the current game.
+ * If possible, creates a new player in the current game and focus in its input
  * This action will do nothing if there is no current game
  * or if the maximum number of players is reached.
  * When adding the last possible player, the corresponding menu item will be disabled.
  */
 function createNewPlayerFn() {
   const newPlayerNb = this.players.length + 1
-  if (newPlayerNb === 1 || newPlayerNb > settings.NB_PLAYERS_MAX) return
-  this.players.push(new Player(newPlayerNb))
-  if (newPlayerNb >= settings.NB_PLAYERS_MAX) ipc.send(events.disableNewPlayerMenuItem)
+  const proceed = newPlayerNb !== 1 & newPlayerNb <= settings.NB_PLAYERS_MAX
+  if (proceed) {
+    this.players.push(new Player({id: newPlayerNb, focus: true}))
+    if (newPlayerNb >= settings.NB_PLAYERS_MAX) ipc.send(events.disableNewPlayerMenuItem)
+  }
 }

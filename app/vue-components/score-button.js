@@ -25,7 +25,7 @@ const component = Vue.component('score-button', {
     autoIncrement: autoIncrementFn,
     changeScore: changeScoreFn
   },
-  template: '<button @mousedown="initiateAutoIncrement(player, modifier)" @mouseup="resolveModifier(player, modifier)" class="btn waves-effect" tabindex="-1">{{ label }}</button>'
+  template: '<button :disabled="!player.name" @mousedown="initiateAutoIncrement(player, modifier)" @mouseup="resolveModifier(player, modifier)" class="btn waves-effect" tabindex="-1">{{ label }}</button>'
 })
 
 module.exports = component
