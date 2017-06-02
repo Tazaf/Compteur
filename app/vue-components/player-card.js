@@ -12,7 +12,7 @@ const component = Vue.component('player-card', {
     sendPlayerScore: sendPlayerScoreFn
   },
   template: `
-    <div class="col m12 l6 player-card" :id="player.id">
+    <div class="col m12 l6" :id="player.id">
       <div class="card-panel blue-grey-text text-darken-3 player">
         <div class="player-name">
           <div class="input-field">

@@ -1,15 +1,14 @@
 const component = Vue.component('player-result', {
   props: ['player'],
   template: `
-    <div class="card">
-      <div class="card-content">
-        <div class="player-info">
-          <span class="player-name">{{ player.name || 'Joueur ' + player.id }}</span>
-          <span class="player-score">{{ player.score }}</span>
-        </div>
-        <div class="bar-wrapper">
-          <div class="outer-bar"></div>
-          <div class="inner-bar deep-orange accent-2"></div>
+    <div id="results">
+      <div class="player-result">
+        <div class="player-score">{{ player.score }}</div>
+        <div class="wrapper">
+          <div class="player-name">{{ player.name || 'Joueur ' + player.id }}</div>
+          <div class="outer-bar">
+            <div class="inner-bar"></div>
+          </div>
         </div>
       </div>
     </div>
