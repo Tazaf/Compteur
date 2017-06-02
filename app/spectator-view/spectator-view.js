@@ -1,13 +1,96 @@
+/* ----- SYSTEM IMPORTS ----- */
+
 const path = require('path')
 const electron = require('electron')
 const _ = require('lodash')
 const ipc = electron.ipcRenderer
+
+/* ----- CUSTOM IMPORTS ----- */
+
 const events = require(path.join(__dirname, '..', 'lib', 'event-service.js'))
 const Components = require(path.join(__dirname, '..', 'components', 'components-module.js'))
 const Settings = require(path.join(__dirname, '..', 'lib', 'settings-constants.js'))
+const Logger = require(path.join(__dirname, '..', 'lib', 'logger.js'))
+const Player = require(path.join(__dirname, '..', 'lib', 'player-class.js'))
+
+/* ----- VUE COMPONENTS ----- */
+
+const noGame = require(path.join(__dirname, '..', 'vue-components', 'no-game.js'))
+const playerResult = require(path.join(__dirname, '..', 'vue-components', 'player-result.js'))
+
+const spectator = new Vue({
+  el: '#spectator',
+  data: {
+    state: 'no-game',
+    players: [],
+    viewType: 'horizontal'
+  },
+  methods: {
+    reflectNewGame: reflectNewGameFn,
+    addNewPlayer: addNewPlayerFn,
+    updatePlayerName: updatePlayerNameFn,
+    updatePlayerScore: updatePlayerScoreFn,
+    setViewType: setViewTypeFn
+  }
+})
+
+/* ----- INTERNAL EVENTS ----- */
+
+ipc.on(events.nbPlayerSelected, spectator.reflectNewGame)
+
+ipc.on(events.addNewPlayer, spectator.addNewPlayer)
+
+ipc.on(events.updatePlayerName, spectator.updatePlayerName)
+
+ipc.on(events.changeDisplayType, spectator.setViewType)
+
+/* ----- FUNCTIONS DECLARATIONS ----- */
+
+/**
+ * Create as many new Players in the players data than the given number of players.
+ * Then changes the state of the spectator view from 'no-game' to 'game'.
+ * @param {*} event 
+ * @param {*} nbPlayer 
+ */
+function reflectNewGameFn(event, nbPlayer) {
+  this.players = []
+  for (let i = 1; i <= nbPlayer; i++) {
+    this.players.push(new Player({ id: i }))
+  }
+  this.state = 'game'
+}
+
+/**
+ * Adds a new player in the game, whose id is actual number of players, plus one.
+ */
+function addNewPlayerFn() {
+  const newPlayerId = this.players.length + 1
+  if (newPlayerId <= Settings.NB_PLAYERS_MAX) {
+    this.players.push(new Player({ id: newPlayerId }))
+  }
+}
+
+/**
+ * Updates the name of a specific player, based on the values received in updatedPlayer argument.
+ * This argument should be an object with at least id and name properties.
+ * A player with the equivalent id will be searched in the players array and, if found, its name will be updated.
+ * @param {*} event 
+ * @param {*} updatedPlayer
+ */
+function updatePlayerNameFn(event, updatedPlayer) {
+  const player = _.find(this.players, {id: updatedPlayer.id})
+  player && (player.name = updatedPlayer.name)
+}
+
+function setViewTypeFn(event, args) {
+  if (this.viewType !== args.displayType) {
+    this.viewType = args.displayType
+  }
+}
+
+/* ----- LEGACY ----- */
 
 const $resultZone = $("#results")
-const $noGame = $("#no-game")
 const $main = $("main")
 
 let viewType = Settings.HORIZONTAL_VIEW_TYPE
@@ -21,47 +104,13 @@ animateScore[Settings.HORIZONTAL_VIEW_TYPE] = animateHorizontalScore
 
 /* ----- INTERNAL EVENTS ----- */
 
-$noGame.on('click', '#new-counter', () => ipc.send(events.nbPlayerModal))
 
-ipc.on(events.nbPlayerSelected, reflectNewGame)
+ipc.on(events.updatePlayerScore, updatePlayerScoreFn)
 
-ipc.on(events.updatePlayerName, updatePlayerName)
-
-ipc.on(events.updatePlayerScore, updatePlayerScore)
-
-ipc.on(events.addNewPlayer, addNewPlayer)
-
-ipc.on(events.changeDisplayType, (event, args) => setViewType(args.displayType))
-
-Components.getNoGameMessage().then(template => $noGame.append(template))
 
 $main.addClass(viewType)
 
 /* ----- FUNCTION DECLARATIONS ----- */
-
-function reflectNewGame(event, nbPlayer) {
-  $resultZone.empty()
-  $activePlayers = []
-  playerScores = []
-  Components.getPlayerResult()
-    .then(template => {
-      for (let i = 1; i <= nbPlayer; i++) {
-        addNewPlayerResultComponent(template, i)
-      }
-      $noGame.addClass('hide')
-      $resultZone.removeClass('hide')
-    })
-}
-
-function addNewPlayer() {
-  const nbPlayer = $activePlayers.length
-  if (nbPlayer <= Settings.NB_PLAYERS_MAX) {
-    Components.getPlayerResult()
-      .then(template => {
-        addNewPlayerResultComponent(template, nbPlayer)
-      })
-  }
-}
 
 function addNewPlayerResultComponent(template, nbPlayer) {
   const $result = $(template)
@@ -69,12 +118,6 @@ function addNewPlayerResultComponent(template, nbPlayer) {
   $("span.player-name", $result).text(`Joueur ${nbPlayer}`)
   $activePlayers[nbPlayer] = $result
   $resultZone.append($result)
-}
-
-function updatePlayerName(event, data) {
-  const $playerResult = $activePlayers[data.playerNb]
-  const $playerName = $("span.player-name", $playerResult)
-  $playerName.text(data.value || `Joueur ${data.playerNb}`)
 }
 
 function updateAllPlayerResults() {
@@ -98,7 +141,7 @@ function animateHorizontalScore($player, ratio) {
   $("div.score-wrapper", $player).animate({ left: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
 }
 
-function updatePlayerScore(event, data) {
+function updatePlayerScoreFn(event, data) {
   playerScores[data.playerNb] = data.score
   updateMaxScore()
   updateAllPlayerResults()

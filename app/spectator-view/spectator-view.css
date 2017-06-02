@@ -32,14 +32,119 @@ div.player-result {
   display: flex;
   align-items: center;
 }
-div.player-result .card-panel {
-  margin: 0;
+
+main.vertical div.player-result {
+  flex-direction: column-reverse;
 }
+
 main.horizontal div.player-result {
   flex-direction: row;
 }
-main.vertical div.player-result {
-  flex-direction: column-reverse;
+
+/* ----- Player Result Card ----- */
+
+div.player-result .card {
+  margin: 0;
+}
+
+main.vertical div.player-result .card {
+  height: 100%;
+}
+
+main.horizontal div.player-result .card {
+  width: 100%;
+}
+
+div.player-result .card .card-content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+main.vertiacl div.player-result .card .card-content {
+  flex-direction: row;
+}
+
+main.horizontal div.player-result .card .card-content {
+  flex-direction: column;
+}
+
+/* ------ Bar Wrapper ----- */
+
+div.bar-wrapper {
+  position: relative;
+}
+
+main.vertical div.bar-wrapper {
+  width: 15px;
+  height: 100%;
+}
+
+main.horizontal div.bar-wrapper {
+  height: 15px;
+  width: 100%;
+}
+
+/* ----- Outer Bar ----- */
+
+div.outer-bar {
+  border-radius: 2px;
+  position: absolute;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+main.vertical div.outer-bar {
+  left: 0;
+  bottom: 0;
+  width: 15px;
+  height: 100%;
+}
+
+main.horizontal div.outer-bar {
+  top: 0;
+  left: 0;
+  height: 15px;
+  width: 100%;
+}
+
+/* ----- Inner Bar ----- */
+
+div.player-result .card .inner-bar {
+  border-radius: 2px;
+  position: absolute;
+}
+
+main.vertical div.inner-bar {
+  left: 0;
+  bottom: 0;
+  width: 15px;
+  height: 87%;
+}
+
+main.horizontal div.inner-bar {
+  top: 0;
+  left: 0;
+  height: 15px;
+  width: 87%;
+}
+
+div.player-info {
+  font-size: 1.5em;
+  display: flex;
+}
+
+span.player-name {
+  flex: 10;
+}
+
+span.player-score {
+  flex: 2;
+  text-align: right;
+}
+
+main.vertical span.player-name {
+  align-self: flex-end;
+  transform: rotate(270deg);
 }
 
 span.score-display {

@@ -10,17 +10,17 @@
 </head>
 
 <body class="blue-grey darken-1">
-  <main>
-  <!--<main class="horizontal">-->
-    <div id="no-game" class="blue-grey-text text-lighten-3">
-    </div>
-    <div id="results" class="hide">
+  <main id="spectator" :class="[viewType]">
+    <no-game id="no-game" v-if="state === 'no-game'" class="blue-grey-text text-lighten-3"></no-game>
+    <div id="results" v-if="state === 'game'">
+      <player-result v-for="player in players" :player="player" :key="player.id"></player-result>
     </div>
   </main>
   <script>
     if (typeof module === 'object') { window.module = module; module = undefined; }
   </script>
   <!-- normal script imports etc  -->
+  <script src="../assets/vue-js/vue.js"></script>
   <script src="../assets/jquery/jquery.min.js"></script>
   <script src="../assets/materialize/js/materialize.min.js"></script>
   <!-- Insert this line after script imports -->

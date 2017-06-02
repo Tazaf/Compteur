@@ -56,11 +56,7 @@ ipc.on(events.nbPlayerModal, WindowsManager.showNbPlayersModal)
 
 ipc.on(events.nbPlayerModalClose, () => wins.nbPlayer.close())
 
-ipc.on(events.nbPlayerSelected, (event, args) => {
-  wins.nbPlayer.close()
-  wins.gmView.webContents.send(events.nbPlayerSelected, args)
-  wins.spectator.webContents.send(events.nbPlayerSelected, args)
-})
+ipc.on(events.nbPlayerSelected, nbPlayerSelected)
 
 ipc.on(events.enableNewPlayerMenuItem, () => AppMenuItems.addNewPlayer.enabled = true)
 
@@ -195,6 +191,12 @@ function AppMenu() {
     AppMenu.append(debugMenuItem)
   }
   return AppMenu
+}
+
+function nbPlayerSelected(event, args) {
+  wins.nbPlayer.close()
+  wins.gmView.webContents.send(events.nbPlayerSelected, args)
+  wins.spectator.webContents.send(events.nbPlayerSelected, args)
 }
 
 /**
