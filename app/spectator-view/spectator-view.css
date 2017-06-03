@@ -42,7 +42,6 @@ main.horizontal div.player-result {
 }
 
 main.horizontal div.player-score {
-  background-color: red;
   color: white;
   font-size: 1.5em;
   padding: 15px;
@@ -82,5 +81,6 @@ main.horizontal div.player-name {
 main.horizontal div.inner-bar {
     background-color: red;
     height: 100%;
-    width: 35%;
+    transition: width 0.250s;
+    transition-timing-function: ease-in-out;
 }
