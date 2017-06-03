@@ -29,12 +29,13 @@ const spectator = new Vue({
     highScore
   },
   methods: {
-    reflectNewGame: reflectNewGameFn,
-    addNewPlayer: addNewPlayerFn,
-    updatePlayerName: updatePlayerNameFn,
-    updatePlayerScore: updatePlayerScoreFn,
-    setDisplayType: setDisplayTypeFn,
-    updateAllPlayerResults: updateAllPlayerResultsFn
+    reflectNewGame,
+    addNewPlayer,
+    updatePlayerName,
+    updatePlayerScore,
+    setDisplayType,
+    updateAllPlayerResults,
+    changePlayerTheme
   }
 })
 
@@ -50,6 +51,8 @@ ipc.on(events.changeDisplayType, spectator.setDisplayType)
 
 ipc.on(events.updatePlayerScore, spectator.updatePlayerScore)
 
+ipc.on(events.colorTheme, spectator.changePlayerTheme)
+
 /* ----- FUNCTIONS DECLARATIONS ----- */
 
 /**
@@ -58,7 +61,7 @@ ipc.on(events.updatePlayerScore, spectator.updatePlayerScore)
  * @param {*} event 
  * @param {*} nbPlayer 
  */
-function reflectNewGameFn(event, nbPlayer) {
+function reflectNewGame(event, nbPlayer) {
   this.players = []
   for (let i = 1; i <= nbPlayer; i++) {
     this.players.push(new Player({ id: i }))
@@ -69,7 +72,7 @@ function reflectNewGameFn(event, nbPlayer) {
 /**
  * Adds a new player in the game, whose id is actual number of players, plus one.
  */
-function addNewPlayerFn() {
+function addNewPlayer() {
   const newPlayerId = this.players.length + 1
   if (newPlayerId <= Settings.NB_PLAYERS_MAX) {
     this.players.push(new Player({ id: newPlayerId }))
@@ -83,7 +86,7 @@ function addNewPlayerFn() {
  * @param {*} event 
  * @param {*} updatedPlayer
  */
-function updatePlayerNameFn(event, updatedPlayer) {
+function updatePlayerName(event, updatedPlayer) {
   const player = _.find(this.players, {id: updatedPlayer.id})
   player && (player.name = updatedPlayer.name)
 }
@@ -95,7 +98,7 @@ function updatePlayerNameFn(event, updatedPlayer) {
  * @param {*} event 
  * @param {*} updatedPlayer 
  */
-function updatePlayerScoreFn(event, updatedPlayer) {
+function updatePlayerScore(event, updatedPlayer) {
   const player = _.find(this.players, {id: updatedPlayer.id})
   player && (player.score = updatedPlayer.score)
   this.updateAllPlayerResults()
@@ -106,7 +109,7 @@ function updatePlayerScoreFn(event, updatedPlayer) {
  * @param {*} event 
  * @param {*} args 
  */
-function setDisplayTypeFn(event, args) {
+function setDisplayType(event, args) {
   if (this.viewType !== args.displayType) {
     this.viewType = args.displayType
   }
@@ -123,6 +126,14 @@ function highScore() {
  * Updates all the progress bar percentage for all the players.
  * This is achieve by calculating the value proportionnaly to the player's score and the high score.
  */
-function updateAllPlayerResultsFn() {
+function updateAllPlayerResults() {
   this.players.forEach(player => player.percent = `${player.score * 100 / this.highScore}%`)
+}
+
+
+function changePlayerTheme(event, updatedPlayer) {
+  const player = _.find(this.players, {id: updatedPlayer.id})
+  player && (player.theme = updatedPlayer.theme)
+  this.updateAllPlayerResults()
+
 }

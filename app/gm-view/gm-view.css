@@ -46,6 +46,7 @@ main {
 div.player {
   display: flex;
   justify-content: flex-end;
+  position: relative;
 }
 
 h1.value,
@@ -80,6 +81,67 @@ div.plus-modifiers, div.minus-modifiers {
   width: 145px;
   text-align: center;
   padding: 0 15px;
+}
+
+.player-color-picker {
+  height: 30px;
+  width: 30px;
+  align-self: center;
+  margin: 0 10px 0px 0;
+  border-radius: 50px;
+  border: solid 3px white;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: box-shadow 0.5s;
+}
+
+.player-color-picker:hover {
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.color-picker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: white;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  margin: 5px;
+}
+
+.color-picker .color-row {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.color-choice {
+  flex: 1;
+  border: solid 3px white;
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.color-choice:not(.active) .checkmark {
+  opacity: 0;
+}
+
+.color-choice:not(.active) {
+  cursor: pointer;
+}
+
+.color-choice:not(.active):hover {
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5)
+}
+
+.color-choice.active .checkmark {
+  opacity: 1;
 }
 
 /** Changing the color of the inputs **/

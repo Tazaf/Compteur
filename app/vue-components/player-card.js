@@ -7,13 +7,26 @@ const Logger = require(path.join(__dirname, '..', 'lib', 'logger.js'))
 
 const component = Vue.component('player-card', {
   props: ['player'],
+  data() {
+    return {
+      colorPicker: false
+    }
+  },
   methods: {
     sendPlayerName: _.debounce(sendPlayerNameFn, 150),
-    sendPlayerScore: sendPlayerScoreFn
+    sendPlayerScore: sendPlayerScoreFn,
+    toggleColorPicker: toggleColorPickerFn,
+    setPlayerTheme(color) {
+      this.player.theme = color
+      Logger.log(this.player)
+      this.toggleColorPicker()
+    }
   },
   template: `
     <div class="col m12 l6" :id="player.id">
       <div class="card-panel blue-grey-text text-darken-3 player">
+        <color-picker v-if="colorPicker" :player="player" @selected="setPlayerTheme($event)"></color-picker>
+        <div class="player-color-picker" :class="[player.theme]" @click="toggleColorPicker"></div>
         <div class="player-name">
           <div class="input-field">
             <input v-model="player.name" v-player-focus="player.focus" @keydown="sendPlayerName($event)" type="text" maxlength="25">
@@ -66,4 +79,8 @@ function sendPlayerNameFn(event) {
       name: this.player.name
     })
   }
+}
+
+function toggleColorPickerFn() {
+  this.colorPicker = !this.colorPicker
 }

@@ -18,6 +18,7 @@ const Logger = require(path.join(__dirname, '..', 'lib', 'logger.js'))
 const noGame = require(path.join(__dirname, '..', 'vue-components', 'no-game.js'))
 const newPlayerBtn = require(path.join(__dirname, '..', 'vue-components', 'new-player-button.js'))
 const playerCard = require(path.join(__dirname, '..', 'vue-components', 'player-card.js'))
+const colorPicker = require(path.join(__dirname, '..', 'vue-components', 'color-picker.js'))
 
 Vue.directive('focus', {
   inserted: el => el.focus()

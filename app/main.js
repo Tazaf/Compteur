@@ -67,6 +67,8 @@ ipc.on(events.updatePlayerScore, (event, args) => wins.spectator.webContents.sen
 
 ipc.on(events.addNewPlayer, addNewPlayer)
 
+ipc.on(events.colorTheme, (event, args) => wins.spectator.webContents.send(events.colorTheme, args))
+
 /* ----- FUNCTIONS DECLARATIONS ----- */
 
 /**
