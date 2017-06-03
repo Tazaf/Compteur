@@ -213,7 +213,7 @@ function addNewPlayer() {
  * Switch the Spectator View to a vertical display, if the window is visible
  */
 function setVerticalDisplay() {
-  if (wins.spectator.isVisible()) {
+  if (wins.spectator.isVisible() && AppMenuItems.display.enabled) {
     changeDisplayType(Settings.VERTICAL_VIEW_TYPE)
     AppMenuItems.verticalDisplay.checked = true
   }

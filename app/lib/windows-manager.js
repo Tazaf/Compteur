@@ -47,7 +47,7 @@ function createGameMasterView() {
 function createSpectatorView() {
   wins.spectator = new BrowserWindow({
     parent: wins.gmView,
-    // show: false,
+    show: false,
     width: 800,
     height: 600,
     skipTaskbar: false,
@@ -55,7 +55,7 @@ function createSpectatorView() {
     title: "Vue spectateur"
   })
   wins.spectator.setMenu(null)
-  wins.spectator.webContents.openDevTools()
+  DEBUG && wins.spectator.webContents.openDevTools()
   wins.spectator.on('close', (e) => {
     toggleSpectatorView()
     e.preventDefault()

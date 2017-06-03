@@ -16,6 +16,7 @@ Object.defineProperty(exports, 'spectatorViewOff', { get: () => getMenuItemFromC
 Object.defineProperty(exports, 'verticalDisplay', { get: () => getMenuItemFromCache('verticalDisplay') });
 Object.defineProperty(exports, 'horizontalDisplay', { get: () => getMenuItemFromCache('horizontalDisplay') });
 Object.defineProperty(exports, 'addNewPlayer', { get: () => getMenuItemFromCache('addNewPlayer') });
+Object.defineProperty(exports, 'display', { get: () => getMenuItemFromCache('display') });
 
 /* ----- EXPORTED FUNCTIONS ----- */
 
@@ -66,7 +67,7 @@ function switchSpectatorViewFn(state) {
  * @param {Boolean} state The state of the Spectator View Menu Items 
  */
 function enableSpectatorViewItemsFn(state) {
-  getMenuItemFromCache('display').enabled = state
+  // getMenuItemFromCache('display').enabled = state
   getMenuItemFromCache('fullScreenOn').enabled = state
   getMenuItemFromCache('fullScreenOff').enabled = state
   // getMenuItemFromCache('playerSort').enabled = state
