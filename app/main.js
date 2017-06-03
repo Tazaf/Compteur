@@ -137,7 +137,7 @@ function AppMenu() {
           click: WindowsManager.toggleSpectatorViewFullScreen,
           visible: false
         }, { type: 'separator' }, {
-          label: 'Affichage...',
+          label: "Type d'affichage...",
           id: 'display',
           enabled: false,
           submenu: [
