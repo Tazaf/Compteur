@@ -17,6 +17,7 @@
   "author": "Mathias (Tazaf) Oberson <obersonmathias@gmail.com>",
   "devDependencies": {
     "electron": "^1.6.5",
+    "electron-builder": "^18.3.5",
     "live-reload": "^1.1.0"
   },
   "build": {
