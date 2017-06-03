@@ -25,7 +25,7 @@ const component = Vue.component('player-card', {
   template: `
     <div class="col m12 l6" :id="player.id">
       <div class="card-panel blue-grey-text text-darken-3 player">
-        <color-picker v-if="colorPicker" :player="player" @selected="setPlayerTheme($event)"></color-picker>
+        <color-picker v-if="colorPicker" :player="player" @selected="setPlayerTheme($event)" @close="toggleColorPicker"></color-picker>
         <div class="player-color-picker" :class="[player.theme]" @click="toggleColorPicker"></div>
         <div class="player-name">
           <div class="input-field">

@@ -39,13 +39,23 @@ const component = Vue.component('color-picker', {
         },
         restoreDefaultTheme() {
             this.sendColorTheme(this.player.theme)
+        },
+        closePicker() {
+            this.$emit('close')
         }
     },
     template: `
         <div class="color-picker">
-            <div class="color-row" v-for="colorRow in colors">
-                <div class="color-choice" v-for="color in colorRow" :class="[color, isActive(color)]" @mouseout="restoreDefaultTheme" @mouseover="sendColorTheme(color)" @click="selectColorTheme(color)">
-                    <i class="material-icons checkmark">check</i>
+            <div class="close-picker">
+                <div class="close-picker-btn red-text" @click="closePicker">
+                    <i class="material-icons">close</i>
+                </div>
+            </div>
+            <div class="colors">
+                <div class="color-row" v-for="colorRow in colors">
+                    <div class="color-choice" v-for="color in colorRow" :class="[color, isActive(color)]" @mouseout="restoreDefaultTheme" @mouseover="sendColorTheme(color)" @click="selectColorTheme(color)">
+                        <i class="material-icons checkmark">check</i>
+                    </div>
                 </div>
             </div>
         </div>
