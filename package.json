@@ -11,7 +11,7 @@
     "dist": "build"
   },
   "main": "app/main.js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "description": "Compteur de points",
   "author": "Mathias (Tazaf) Oberson <obersonmathias@gmail.com>",
