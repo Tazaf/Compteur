@@ -21,16 +21,20 @@ const playerResult = require(path.join(__dirname, '..', 'vue-components', 'playe
 const spectator = new Vue({
   el: '#spectator',
   data: {
-    state: 'no-game',
+    state: Settings.NO_GAME_STATE,
     players: [],
-    viewType: 'horizontal'
+    viewType: Settings.HORIZONTAL_VIEW_TYPE,
+  },
+  computed: {
+    highScore
   },
   methods: {
     reflectNewGame: reflectNewGameFn,
     addNewPlayer: addNewPlayerFn,
     updatePlayerName: updatePlayerNameFn,
     updatePlayerScore: updatePlayerScoreFn,
-    setViewType: setViewTypeFn
+    setDisplayType: setDisplayTypeFn,
+    updateAllPlayerResults: updateAllPlayerResultsFn
   }
 })
 
@@ -42,7 +46,9 @@ ipc.on(events.addNewPlayer, spectator.addNewPlayer)
 
 ipc.on(events.updatePlayerName, spectator.updatePlayerName)
 
-ipc.on(events.changeDisplayType, spectator.setViewType)
+ipc.on(events.changeDisplayType, spectator.setDisplayType)
+
+ipc.on(events.updatePlayerScore, spectator.updatePlayerScore)
 
 /* ----- FUNCTIONS DECLARATIONS ----- */
 
@@ -57,7 +63,7 @@ function reflectNewGameFn(event, nbPlayer) {
   for (let i = 1; i <= nbPlayer; i++) {
     this.players.push(new Player({ id: i }))
   }
-  this.state = 'game'
+  this.state = Settings.GAME_STATE
 }
 
 /**
@@ -73,7 +79,7 @@ function addNewPlayerFn() {
 /**
  * Updates the name of a specific player, based on the values received in updatedPlayer argument.
  * This argument should be an object with at least id and name properties.
- * A player with the equivalent id will be searched in the players array and, if found, its name will be updated.
+ * A player with the equivalent id will be searched through the players array and, if found, its name will be updated.
  * @param {*} event 
  * @param {*} updatedPlayer
  */
@@ -82,89 +88,41 @@ function updatePlayerNameFn(event, updatedPlayer) {
   player && (player.name = updatedPlayer.name)
 }
 
-function setViewTypeFn(event, args) {
+/**
+ * Updates the score of a specfici player, based on the values received in updatePlayer argument.
+ * This argument should be an object with at least id and score properties.
+ * A player with the equivalent id will be searched through the player array and, if found, its score will be updated.
+ * @param {*} event 
+ * @param {*} updatedPlayer 
+ */
+function updatePlayerScoreFn(event, updatedPlayer) {
+  const player = _.find(this.players, {id: updatedPlayer.id})
+  player && (player.score = updatedPlayer.score)
+  this.updateAllPlayerResults()
+}
+
+/**
+ * Changes the view type of the spectator view for the value of args.displayType
+ * @param {*} event 
+ * @param {*} args 
+ */
+function setDisplayTypeFn(event, args) {
   if (this.viewType !== args.displayType) {
     this.viewType = args.displayType
   }
 }
 
-/* ----- LEGACY ----- */
-
-const $resultZone = $("#results")
-const $main = $("main")
-
-let viewType = Settings.HORIZONTAL_VIEW_TYPE
-let $activePlayers = []
-let playerScores = []
-let maxScore
-
-let animateScore = {}
-animateScore[Settings.VERTICAL_VIEW_TYPE] = animateVerticalScore
-animateScore[Settings.HORIZONTAL_VIEW_TYPE] = animateHorizontalScore
-
-/* ----- INTERNAL EVENTS ----- */
-
-
-ipc.on(events.updatePlayerScore, updatePlayerScoreFn)
-
-
-$main.addClass(viewType)
-
-/* ----- FUNCTION DECLARATIONS ----- */
-
-function addNewPlayerResultComponent(template, nbPlayer) {
-  const $result = $(template)
-  $result.attr('id', nbPlayer)
-  $("span.player-name", $result).text(`Joueur ${nbPlayer}`)
-  $activePlayers[nbPlayer] = $result
-  $resultZone.append($result)
-}
-
-function updateAllPlayerResults() {
-  $activePlayers.forEach(updatePlayerResult)
-}
-
-function updatePlayerResult($player) {
-  const playerNb = $player.attr('id')
-  $("span.score-display", $player).text(playerScores[playerNb])
-  const ratio = playerScores[playerNb] === 0 ? 0 : playerScores[playerNb] * 100 / maxScore
-  !isNaN(ratio) && animateScore[viewType]($player, ratio)
-}
-
-function animateVerticalScore($player, ratio) {
-  $("div.inner-score", $player).animate({ height: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
-  $("div.score-wrapper", $player).animate({ bottom: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
-}
-
-function animateHorizontalScore($player, ratio) {
-  $("div.inner-score", $player).animate({ width: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
-  $("div.score-wrapper", $player).animate({ left: `${ratio}%` }, Settings.SCORE_ANIMATION_SPEED)
-}
-
-function updatePlayerScoreFn(event, data) {
-  playerScores[data.playerNb] = data.score
-  updateMaxScore()
-  updateAllPlayerResults()
-}
-
-function switchDisplay() {
-  $activePlayers.forEach($player => {
-    $("div.inner-score", $player).removeAttr('style')
-    $("div.score-wrapper", $player).removeAttr('style')
-    updatePlayerResult($player)
-  })
+/**
+ * Returns the highest score among all the players' scores.
+ */
+function highScore() {
+  return _.max(_.map(this.players, (player) => player.score))
 }
 
 /**
- * Returns the greater current score among all active players
+ * Updates all the progress bar percentage for all the players.
+ * This is achieve by calculating the value proportionnaly to the player's score and the high score.
  */
-function updateMaxScore() {
-  maxScore = _.max(playerScores)
-}
-
-function setViewType(displayType) {
-  if (viewType === displayType) return
-  viewType = displayType
-  $main.attr('class', viewType)
-  switchDisplay()
+function updateAllPlayerResultsFn() {
+  this.players.forEach(player => player.percent = `${player.score * 100 / this.highScore}%`)
 }

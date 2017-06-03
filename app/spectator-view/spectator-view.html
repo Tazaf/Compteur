@@ -11,17 +11,17 @@
 
 <body class="blue-grey">
   <main id="spectator" :class="[viewType]">
-    <!--<no-game id="no-game" v-if="state === 'no-game'" class="blue-grey-text text-lighten-3"></no-game>
+    <no-game id="no-game" v-if="state === 'no-game'" class="blue-grey-text text-lighten-3"></no-game>
     <div id="results" v-if="state === 'game'">
       <player-result v-for="player in players" :player="player" :key="player.id"></player-result>
-    </div>-->
-    <div id="results">
+    </div>
+    <!--<div id="results">
       <div class="player-result">
-        <div class="player-score red">999</div>
+        <div class="player-score deep-orange">999</div>
         <div class="wrapper">
           <div class="player-name">Joueur 1</div>
-          <div class="outer-bar red lighten-5">
-            <div class="inner-bar red"></div>
+          <div class="outer-bar deep-orange lighten-5">
+            <div class="inner-bar deep-orange"></div>
           </div>
         </div>
       </div>
@@ -106,7 +106,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>-->
   </main>
   <script>
     if (typeof module === 'object') { window.module = module; module = undefined; }
